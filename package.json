@@ -1,0 +1,52 @@
+{
+  "name": "viksit-vr-education-platform",
+  "version": "1.0.0",
+  "description": "ViksitVR - Virtual Reality Education Platform that transforms traditional learning into immersive, interactive experiences",
+  "main": "index.html",
+  "scripts": {
+    "start": "cd quickmeet-master && npm start",
+    "install-deps": "cd quickmeet-master && npm install",
+    "dev": "cd quickmeet-master && npm run dev",
+    "serve": "npx http-server . -p 8080",
+    "lint": "eslint *.js",
+    "format": "prettier --write *.html *.css *.js"
+  },
+  "keywords": [
+    "virtual-reality",
+    "education",
+    "vr",
+    "learning",
+    "edtech",
+    "immersive-learning",
+    "webxr",
+    "javascript",
+    "nodejs",
+    "socket.io",
+    "webrtc",
+    "ai-assistant"
+  ],
+  "author": {
+    "name": "Moksh",
+    "email": "your-email@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/viksit-vr-education-platform.git"
+  },
+  "homepage": "https://yourusername.github.io/viksit-vr-education-platform",
+  "bugs": {
+    "url": "https://github.com/yourusername/viksit-vr-education-platform/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0"
+  }
+}

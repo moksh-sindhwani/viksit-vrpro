@@ -1,0 +1,1241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ViksitVR</title>
+    <link rel="icon" href="Apple vision canvas images/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="responsive.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background-color: #f4f1ec;
+        cursor: none; /* Hide default cursor */
+      }
+
+      .cursor {
+        position: fixed;
+        width: 40px;
+        height: 40px;
+        border: 2px solid #555;
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 99999; /* Higher z-index to stay above modals */
+        background-color: rgba(0, 0, 0, 0); /* transparent center */
+      }
+
+      /* Login Modal Styles */
+      .login-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .login-modal.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .login-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 40px;
+        width: 90%;
+        max-width: 450px;
+        text-align: center;
+        transform: scale(0.7);
+        transition: all 0.3s ease;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      /* Custom Scrollbar for Login Container */
+      .login-container::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .login-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .login-container::-webkit-scrollbar-thumb {
+        background: rgba(0, 255, 136, 0.6);
+        border-radius: 10px;
+      }
+
+      .login-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 255, 136, 0.8);
+      }
+
+      .login-modal.show .login-container {
+        transform: scale(1);
+      }
+
+      .login-title {
+        color: #00ff88;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+      }
+
+      .login-subtitle {
+        color: white;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+
+      .form-tabs {
+        display: flex;
+        margin-bottom: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 15px;
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+      }
+
+      .tab-button.active {
+        background: #00ff88;
+        color: #000;
+      }
+
+      .user-type-selector {
+        text-align: center;
+      }
+
+      .user-type-btn {
+        flex: 1;
+        padding: 12px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .user-type-btn.active {
+        background: #00ff88;
+        color: #000;
+        border-color: #00ff88;
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+      }
+
+      .user-type-btn:hover {
+        background: rgba(0, 255, 136, 0.2);
+        border-color: #00ff88;
+        color: #00ff88;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        color: white;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #00ff88;
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+      }
+
+      .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(45deg, #00ff88, #00cc6a);
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .close-btn:hover {
+        color: #ff6b6b;
+        transform: scale(1.2);
+      }
+
+      .form-footer {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+
+      .success-message {
+        background: rgba(0, 255, 136, 0.2);
+        border: 1px solid #00ff88;
+        color: #00ff88;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      /* Navigation Auth Button Styles */
+      .nav-auth-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+      }
+
+      .nav-auth-btn:hover {
+        background: rgba(0, 255, 136, 0.2);
+        border-color: #00ff88;
+        color: #00ff88;
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .nav-profile-pic {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #00ff88;
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      }
+
+      .profile-btn {
+        background: rgba(0, 255, 136, 0.1) !important;
+        border-color: #00ff88 !important;
+        color: #00ff88 !important;
+      }
+
+      .profile-btn:hover {
+        background: rgba(0, 255, 136, 0.3) !important;
+        transform: translateY(-2px) scale(1.05);
+      }
+
+      /* AI Doubt Reminder Popup */
+      .ai-doubt-popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 20px;
+        max-width: 350px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 10001;
+        transform: translateX(400px);
+        transition: all 0.5s ease;
+        border: 2px solid rgba(0, 255, 136, 0.3);
+      }
+
+      .ai-doubt-popup.show {
+        transform: translateX(0);
+      }
+
+      .popup-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+
+      .popup-icon {
+        font-size: 2rem;
+        animation: bounce 2s infinite;
+      }
+
+      .popup-close {
+        background: none;
+        border: none;
+        color: #000;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .popup-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        transform: scale(1.1);
+      }
+
+      .popup-title {
+        color: #000;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .popup-content {
+        color: #000;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+      }
+
+      .popup-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      .popup-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+      }
+
+      .popup-btn-primary {
+        background: #00ff88;
+        color: #000;
+      }
+
+      .popup-btn-primary:hover {
+        background: #00cc6a;
+        transform: translateY(-2px);
+      }
+
+      .popup-btn-secondary {
+        background: rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+
+      .popup-btn-secondary:hover {
+        background: rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+      }
+
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+      }
+
+      /* Mobile responsive for popup */
+      @media (max-width: 768px) {
+        .ai-doubt-popup {
+          bottom: 10px;
+          right: 10px;
+          left: 10px;
+          max-width: none;
+          transform: translateY(400px);
+        }
+
+        .ai-doubt-popup.show {
+          transform: translateY(0);
+        }
+
+        .login-container {
+          padding: 20px;
+          max-height: 95vh;
+        }
+
+        .form-group {
+          margin-bottom: 15px;
+        }
+
+        .user-type-btn {
+          padding: 10px 15px;
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main">
+      <div id="page">
+        <video
+          src="https://www.apple.com/105/media/us/apple-vision-pro/2023/7e268c13-eb22-493d-a860-f0637bacb569/anim/hero/large_2x.mp4"
+          muted
+        ></video>
+
+        <nav style="display: flex; align-items: center; gap: 1rem; justify-content: space-between; width: 100%; padding: 0 2rem;">
+          <h3 style="color: white; background: transparent; -webkit-text-stroke: 1.5px #fff; -webkit-text-fill-color: transparent; transition: -webkit-text-fill-color 0.3s, color 0.3s; cursor: pointer; margin: 0; text-align: left; display: inline-block;"
+            onmouseover="this.style.webkitTextFillColor='#fff'; this.style.color='#fff';"
+            onmouseout="this.style.webkitTextFillColor='transparent'; this.style.color='white';"
+          >VRclass</h3>
+          
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="dropdown">
+              <button class="dropbtn">Education</button>
+              <div class="dropdown-content">
+                <a href="test.html">Attempt Test</a>
+                <a href="#" onclick="checkLoginAndRedirect()" id="portalLink">Portal</a>
+                <a href="contact.html">Contact Us</a>
+              </div>
+            </div>
+            
+            <!-- Login Button -->
+            <button id="loginButton" class="nav-auth-btn" onclick="openLoginModal()" style="display: inline-flex;">
+              Login
+            </button>
+            
+            <!-- Profile Button -->
+            <button id="profileButton" class="nav-auth-btn profile-btn" onclick="openProfileModal()" style="display: none;">
+              <img id="navProfilePic" src="" alt="Profile" class="nav-profile-pic" style="display: none;">
+              <span id="navProfileName">Profile</span>
+            </button>
+          </div>
+        </nav>
+        <div id="page-bottom">
+          <h1 style="color: white; background: transparent; -webkit-text-stroke: 1.5px #fff; -webkit-text-fill-color: transparent; transition: -webkit-text-fill-color 0.3s, color 0.3s; cursor: pointer; margin: 0; text-align: left; display: inline-block;"
+            onmouseover="this.style.webkitTextFillColor='#fff'; this.style.color='#fff';"
+            onmouseout="this.style.webkitTextFillColor='transparent'; this.style.color='white';"
+          >Skill Development  <br>in Virtual Reality</h1>
+        </div>
+      </div>
+      <div id="page-1">
+        <h1>Welcome to the future of learning<br /><br />Immersive, engaging, and impactful.</h1>
+        <video src="vid.mp4" autoplay loop muted></video>
+      </div>
+      <div id="page-7">
+        <canvas></canvas>
+      </div>
+      <div id="page-8">
+        <h1><span>Inclusive Learning:</span> ViksitVR adapts to regional needs, languages, and accessibility to reach learners everywhere.</h1>
+      </div>
+      <div id="page-9">
+        <h1><span>Immersive Practice:</span> From job interviews to skill demonstrations, learners engage with real-world scenarios.</h1>
+      </div>
+      <div id="page-10">
+        <h1><span>Flexible Modules:</span> Choose paths like Communication, Digital Literacy, Customer Service, and more.</h1>
+      </div>
+      <div id="page-11">
+        <h1><span>Portable Power:</span> ViksitVR works on basic VR headsets and mobile-based viewers to ensure inclusivity.</h1>
+      </div>
+      <div id="page-12">
+        <h1><span>Multilingual Sound:</span> Personalized Spatial Audio helps learners absorb concepts in their native tongue.</h1>
+      </div>
+      <div id="page-13">
+        <h1><span>Real Feedback:</span> ViksitVR provides performance scores and soft-skill suggestions in real-time.</h1>
+      </div>
+      <div class="custom-cursor" id="customCursor"></div>
+      <footer style="text-align:center; padding: 2rem 0; background: #111; color: #fff; font-size: 1rem;">
+        Made with <span style="color:red;">&#10084;&#65039;</span> by Moksh &mdash; Inspired by Apple.<br>
+        Some images and videos courtesy of <a href="https://www.apple.com/apple-vision-pro/" target="_blank" style="color:#4ea1ff; text-decoration:underline;">Apple Vision Pro</a>.
+      </footer>
+    </div>
+    <div class="cursor"></div>
+
+    <!-- AI Doubt Reminder Popup -->
+    <div class="ai-doubt-popup" id="aiDoubtPopup">
+      <div class="popup-header">
+        <div class="popup-icon">🤖</div>
+        <button class="popup-close" onclick="closeDoubtPopup()">&times;</button>
+      </div>
+      <div class="popup-title">Need Help with Your Studies?</div>
+      <div class="popup-content">
+        Got doubts or questions? Our AI assistant is here 24/7 to help you understand concepts, solve problems, and guide your learning journey!
+      </div>
+      <div class="popup-buttons">
+        <button class="popup-btn popup-btn-primary" onclick="openAIChat()">Ask AI Now</button>
+        <button class="popup-btn popup-btn-secondary" onclick="remindLater()">Remind Later</button>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+      <div class="login-container">
+        <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+        
+        <h2 class="login-title">VR CLASS</h2>
+        <p class="login-subtitle">Login Required for VR Experience</p>
+        
+        <div class="form-tabs">
+          <button class="tab-button active" onclick="switchTab('login')">Login</button>
+          <button class="tab-button" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- User Type Selection -->
+        <div class="user-type-selector" style="margin-bottom: 20px;">
+          <label style="display: block; color: white; margin-bottom: 10px; font-weight: 500;">Login as:</label>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="user-type-btn active" onclick="selectUserType('student')" id="studentTypeBtn">
+              👨‍🎓 Student
+            </button>
+            <button type="button" class="user-type-btn" onclick="selectUserType('teacher')" id="teacherTypeBtn">
+              👩‍🏫 Teacher
+            </button>
+          </div>
+        </div>
+
+        <div id="successMessage" class="success-message">
+          Account created successfully! Redirecting to VR Experience... 🎉
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" style="display: block;">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-input" placeholder="Enter your email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required>
+          </div>
+          
+          <button type="submit" class="submit-btn">Login & Enter VR Class</button>
+          
+          <div class="form-footer">
+            <p>Don't have an account? <a href="#" onclick="switchTab('signup')" style="color: #00ff88;">Sign up here</a></p>
+          </div>
+        </form>
+        
+        <!-- Signup Form -->
+        <form id="signupForm" style="display: none;">
+          <div class="form-group">
+            <label for="signupName">Full Name</label>
+            <input type="text" id="signupName" class="form-input" placeholder="Enter your full name" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="signupEmail">Email Address</label>
+            <input type="email" id="signupEmail" class="form-input" placeholder="Enter your email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" class="form-input" placeholder="Create a password" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="signupConfirmPassword">Confirm Password</label>
+            <input type="password" id="signupConfirmPassword" class="form-input" placeholder="Confirm your password" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="signupAge">Age</label>
+            <input type="number" id="signupAge" class="form-input" placeholder="Enter your age" min="5" max="100" required>
+          </div>
+          
+          <!-- Student-specific fields -->
+          <div class="form-group student-field">
+            <label for="signupGrade">Grade/Class</label>
+            <select id="signupGrade" class="form-input">
+              <option value="">Select your grade</option>
+              <option value="grade-1">Grade 1</option>
+              <option value="grade-2">Grade 2</option>
+              <option value="grade-3">Grade 3</option>
+              <option value="grade-4">Grade 4</option>
+              <option value="grade-5">Grade 5</option>
+              <option value="grade-6">Grade 6</option>
+              <option value="grade-7">Grade 7</option>
+              <option value="grade-8">Grade 8</option>
+              <option value="grade-9">Grade 9</option>
+              <option value="grade-10">Grade 10</option>
+              <option value="grade-11">Grade 11</option>
+              <option value="grade-12">Grade 12</option>
+              <option value="college">College</option>
+              <option value="adult">Adult Learner</option>
+            </select>
+          </div>
+
+          <!-- Teacher-specific fields -->
+          <div class="form-group teacher-field" style="display: none;">
+            <label for="signupSubject">Subject/Department</label>
+            <select id="signupSubject" class="form-input">
+              <option value="">Select your subject</option>
+              <option value="mathematics">Mathematics</option>
+              <option value="science">Science</option>
+              <option value="physics">Physics</option>
+              <option value="chemistry">Chemistry</option>
+              <option value="biology">Biology</option>
+              <option value="english">English</option>
+              <option value="history">History</option>
+              <option value="geography">Geography</option>
+              <option value="computer-science">Computer Science</option>
+              <option value="art">Art & Design</option>
+              <option value="music">Music</option>
+              <option value="physical-education">Physical Education</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group teacher-field" style="display: none;">
+            <label for="signupExperience">Teaching Experience (Years)</label>
+            <select id="signupExperience" class="form-input">
+              <option value="">Select experience</option>
+              <option value="0-1">0-1 years</option>
+              <option value="2-5">2-5 years</option>
+              <option value="6-10">6-10 years</option>
+              <option value="11-15">11-15 years</option>
+              <option value="16-20">16-20 years</option>
+              <option value="20+">20+ years</option>
+            </select>
+          </div>
+
+          <div class="form-group teacher-field" style="display: none;">
+            <label for="signupInstitution">Institution/School</label>
+            <input type="text" id="signupInstitution" class="form-input" placeholder="Enter your institution name">
+          </div>
+          
+          <button type="submit" class="submit-btn">Create Account & Enter VR</button>
+          
+          <div class="form-footer">
+            <p>Already have an account? <a href="#" onclick="switchTab('login')" style="color: #00ff88;">Login here</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="login-modal" id="profileModal">
+      <div class="login-container">
+        <button class="close-btn" onclick="closeProfileModal()">&times;</button>
+        
+        <div class="profile-header" style="margin-bottom: 30px;">
+          <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 20px;">
+            <div id="profilePicDisplay" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #00ff88; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #00ff88;">👤</div>
+            <button onclick="document.getElementById('profilePicInput').click()" style="position: absolute; bottom: 0; right: 0; background: #00ff88; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1rem;">📷</button>
+            <input type="file" id="profilePicInput" style="display: none;" accept="image/*" onchange="handleProfilePicUpload(event)">
+          </div>
+          <h2 class="login-title" id="profileDisplayName">Loading...</h2>
+          <p class="login-subtitle" id="profileDisplayRole">VR Class Student</p>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 30px;">
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <span style="color: rgba(255, 255, 255, 0.8);">Email:</span>
+            <span style="color: #00ff88;" id="profileDisplayEmail">Loading...</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <span style="color: rgba(255, 255, 255, 0.8);">Age:</span>
+            <span style="color: #00ff88;" id="profileDisplayAge">Loading...</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <span style="color: rgba(255, 255, 255, 0.8);">Grade:</span>
+            <span style="color: #00ff88;" id="profileDisplayGrade">Loading...</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+            <span style="color: rgba(255, 255, 255, 0.8);">Member Since:</span>
+            <span style="color: #00ff88;" id="profileDisplayJoined">Loading...</span>
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="editProfile()">Edit Profile</button>
+        <button onclick="logout()" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #ff6b6b, #ff5252); border: none; border-radius: 10px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">Logout</button>
+      </div>
+    </div>
+
+    <script>
+    const cursor = document.querySelector('.cursor');
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Login Modal Functions
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+      
+      // Ensure cursor remains visible
+      const cursor = document.querySelector('.cursor');
+      if (cursor) {
+        cursor.style.zIndex = '99999';
+        cursor.style.display = 'block';
+      }
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+      document.getElementById('successMessage').style.display = 'none';
+      
+      // Ensure cursor remains visible after closing modal
+      const cursor = document.querySelector('.cursor');
+      if (cursor) {
+        cursor.style.display = 'block';
+      }
+    }
+
+    function checkLoginAndRedirect() {
+      const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+      if (currentUser) {
+        // User is logged in, redirect based on user type
+        if (currentUser.userType === 'teacher') {
+          window.location.href = 'teacher-portal.html';
+        } else {
+          window.location.href = 'viksitVR.html';
+        }
+      } else {
+        // User not logged in, show login modal
+        openLoginModal();
+      }
+    }
+
+    function switchTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const tabButtons = document.querySelectorAll('.tab-button');
+      
+      // Remove active class from all tabs
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      
+      if (tab === 'login') {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        tabButtons[0].classList.add('active');
+      } else {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+        tabButtons[1].classList.add('active');
+        // Reset user type when switching to signup
+        selectUserType('student');
+      }
+      
+      // Hide success message when switching tabs
+      document.getElementById('successMessage').style.display = 'none';
+    }
+
+    // User Type Selection
+    let currentUserType = 'student';
+
+    function selectUserType(type) {
+      currentUserType = type;
+      
+      // Update button states
+      const studentBtn = document.getElementById('studentTypeBtn');
+      const teacherBtn = document.getElementById('teacherTypeBtn');
+      
+      if (type === 'student') {
+        studentBtn.classList.add('active');
+        teacherBtn.classList.remove('active');
+        
+        // Show student fields, hide teacher fields
+        const studentFields = document.querySelectorAll('.student-field');
+        const teacherFields = document.querySelectorAll('.teacher-field');
+        
+        studentFields.forEach(field => {
+          field.style.display = 'block';
+          const input = field.querySelector('input, select');
+          if (input) input.required = true;
+        });
+        
+        teacherFields.forEach(field => {
+          field.style.display = 'none';
+          const input = field.querySelector('input, select');
+          if (input) input.required = false;
+        });
+        
+      } else if (type === 'teacher') {
+        teacherBtn.classList.add('active');
+        studentBtn.classList.remove('active');
+        
+        // Show teacher fields, hide student fields
+        const studentFields = document.querySelectorAll('.student-field');
+        const teacherFields = document.querySelectorAll('.teacher-field');
+        
+        teacherFields.forEach(field => {
+          field.style.display = 'block';
+          const input = field.querySelector('input, select');
+          if (input) input.required = true;
+        });
+        
+        studentFields.forEach(field => {
+          field.style.display = 'none';
+          const input = field.querySelector('input, select');
+          if (input) input.required = false;
+        });
+      }
+    }
+
+    // Handle Login Form Submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      // Check if user exists in localStorage
+      const users = JSON.parse(localStorage.getItem('vrClassUsers') || '[]');
+      const user = users.find(u => u.email === email && u.password === password);
+      
+      if (user) {
+        // Check if user type matches selection
+        const selectedType = document.querySelector('.user-type-btn.active').id === 'studentTypeBtn' ? 'student' : 'teacher';
+        
+        if (user.userType !== selectedType) {
+          alert(`This account is registered as a ${user.userType}. Please select the correct user type.`);
+          return;
+        }
+        
+        // Login successful
+        localStorage.setItem('vrClassCurrentUser', JSON.stringify(user));
+        
+        if (user.userType === 'teacher') {
+          showSuccessMessage(`Welcome back, ${user.name}! Accessing Teacher Portal... 👩‍🏫`);
+          setTimeout(() => {
+            // Redirect to teacher portal
+            window.location.href = 'teacher-portal.html';
+          }, 2000);
+        } else {
+          showSuccessMessage(`Welcome back, ${user.name}! Entering VR Experience... 🚀`);
+          setTimeout(() => {
+            window.location.href = 'viksitVR.html';
+          }, 2000);
+        }
+      } else {
+        alert('Invalid email or password. Please try again or create an account.');
+      }
+    });
+
+    // Handle Signup Form Submission
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+      const age = document.getElementById('signupAge').value;
+      
+      // Validation
+      if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      // Check if user already exists
+      const users = JSON.parse(localStorage.getItem('vrClassUsers') || '[]');
+      if (users.find(u => u.email === email)) {
+        alert('An account with this email already exists. Please login instead.');
+        return;
+      }
+      
+      // Create new user object
+      const newUser = {
+        id: Date.now(),
+        name: name,
+        email: email,
+        password: password,
+        age: age,
+        userType: currentUserType,
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+      
+      // Add type-specific data
+      if (currentUserType === 'student') {
+        const grade = document.getElementById('signupGrade').value;
+        newUser.grade = grade;
+      } else if (currentUserType === 'teacher') {
+        const subject = document.getElementById('signupSubject').value;
+        const experience = document.getElementById('signupExperience').value;
+        const institution = document.getElementById('signupInstitution').value;
+        
+        newUser.subject = subject;
+        newUser.experience = experience;
+        newUser.institution = institution;
+      }
+      
+      // Save user to localStorage
+      users.push(newUser);
+      localStorage.setItem('vrClassUsers', JSON.stringify(users));
+      localStorage.setItem('vrClassCurrentUser', JSON.stringify(newUser));
+      
+      // Show success message and redirect
+      if (currentUserType === 'teacher') {
+        showSuccessMessage(`Account created successfully! Welcome ${name}! Accessing Teacher Portal... 👩‍🏫`);
+      } else {
+        showSuccessMessage(`Account created successfully! Welcome ${name}! Entering VR Experience... 🎉`);
+      }
+      
+      // Clear form
+      document.getElementById('signupForm').reset();
+      selectUserType('student'); // Reset to default
+      
+      setTimeout(() => {
+        if (currentUserType === 'teacher') {
+          window.location.href = 'teacher-portal.html';
+        } else {
+          window.location.href = 'viksitVR.html';
+        }
+      }, 2000);
+    });
+
+    function showSuccessMessage(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('loginModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeLoginModal();
+      }
+    });
+
+    // Profile Management Functions
+    function openProfileModal() {
+      const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+      if (!currentUser) {
+        openLoginModal();
+        return;
+      }
+      
+      loadProfileData(currentUser);
+      document.getElementById('profileModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+      
+      // Ensure cursor remains visible
+      const cursor = document.querySelector('.cursor');
+      if (cursor) {
+        cursor.style.zIndex = '99999';
+        cursor.style.display = 'block';
+      }
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+      
+      // Ensure cursor remains visible after closing modal
+      const cursor = document.querySelector('.cursor');
+      if (cursor) {
+        cursor.style.display = 'block';
+      }
+    }
+
+    function loadProfileData(user) {
+      document.getElementById('profileDisplayName').textContent = user.name;
+      document.getElementById('profileDisplayEmail').textContent = user.email;
+      document.getElementById('profileDisplayAge').textContent = user.age;
+      
+      // Set role based on user type
+      const roleElement = document.getElementById('profileDisplayRole');
+      if (user.userType === 'teacher') {
+        roleElement.textContent = 'VR Class Teacher';
+      } else {
+        roleElement.textContent = 'VR Class Student';
+      }
+      
+      // Display different information based on user type
+      if (user.userType === 'teacher') {
+        document.getElementById('profileDisplayGrade').textContent = user.subject || 'Not specified';
+        // Change the label for teacher
+        const gradeLabel = document.querySelector('[style*="Grade:"]');
+        if (gradeLabel) {
+          gradeLabel.innerHTML = gradeLabel.innerHTML.replace('Grade:', 'Subject:');
+        }
+      } else {
+        document.getElementById('profileDisplayGrade').textContent = formatGrade(user.grade);
+      }
+      
+      const joinedDate = new Date(user.createdAt).toLocaleDateString();
+      document.getElementById('profileDisplayJoined').textContent = joinedDate;
+      
+      if (user.profilePicture) {
+        const profilePicDisplay = document.getElementById('profilePicDisplay');
+        profilePicDisplay.innerHTML = `<img src="${user.profilePicture}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+      }
+    }
+
+    function formatGrade(grade) {
+      const gradeMap = {
+        'grade-1': 'Grade 1', 'grade-2': 'Grade 2', 'grade-3': 'Grade 3',
+        'grade-4': 'Grade 4', 'grade-5': 'Grade 5', 'grade-6': 'Grade 6',
+        'grade-7': 'Grade 7', 'grade-8': 'Grade 8', 'grade-9': 'Grade 9',
+        'grade-10': 'Grade 10', 'grade-11': 'Grade 11', 'grade-12': 'Grade 12',
+        'college': 'College', 'adult': 'Adult Learner'
+      };
+      return gradeMap[grade] || grade;
+    }
+
+    function handleProfilePicUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+        
+        const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+        if (!currentUser) return;
+        
+        currentUser.profilePicture = imageData;
+        
+        const users = JSON.parse(localStorage.getItem('vrClassUsers') || '[]');
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+          users[userIndex] = currentUser;
+          localStorage.setItem('vrClassUsers', JSON.stringify(users));
+        }
+        
+        localStorage.setItem('vrClassCurrentUser', JSON.stringify(currentUser));
+        
+        // Update profile display
+        const profilePicDisplay = document.getElementById('profilePicDisplay');
+        profilePicDisplay.innerHTML = `<img src="${imageData}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        
+        // Update navbar profile pic
+        updateNavbarProfilePic(currentUser);
+        
+        showSuccessMessage('Profile picture updated! 📸');
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
+    function updatePortalLink(user) {
+      const portalLink = document.getElementById('portalLink');
+      if (user && user.userType === 'teacher') {
+        portalLink.textContent = '👩‍🏫 Teacher Portal';
+      } else {
+        portalLink.textContent = '👨‍🎓 Student Portal';
+      }
+    }
+
+    function updateNavbarProfilePic(user) {
+      const navProfilePic = document.getElementById('navProfilePic');
+      const navProfileName = document.getElementById('navProfileName');
+      
+      // Show name with appropriate emoji for user type
+      if (user.userType === 'teacher') {
+        navProfileName.textContent = `👩‍🏫 ${user.name.split(' ')[0]}`;
+      } else {
+        navProfileName.textContent = user.name.split(' ')[0];
+      }
+      
+      if (user.profilePicture) {
+        navProfilePic.src = user.profilePicture;
+        navProfilePic.style.display = 'inline-block';
+      } else {
+        navProfilePic.style.display = 'none';
+      }
+    }
+
+    function editProfile() {
+      const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+      if (currentUser && currentUser.userType === 'teacher') {
+        window.location.href = 'teacher-portal.html';
+      } else {
+        window.location.href = 'viksitVR.html';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('vrClassCurrentUser');
+      closeProfileModal();
+      
+      // Reset UI
+      document.getElementById('loginButton').style.display = 'inline-flex';
+      document.getElementById('profileButton').style.display = 'none';
+      
+      showSuccessMessage('Logged out successfully! 👋');
+    }
+
+    // Check if user is already logged in on page load
+    window.addEventListener('load', function() {
+      console.log('Page loaded, initializing...');
+      
+      const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+      if (currentUser) {
+        // Hide login button, show profile button
+        document.getElementById('loginButton').style.display = 'none';
+        document.getElementById('profileButton').style.display = 'inline-flex';
+        
+        updateNavbarProfilePic(currentUser);
+        updatePortalLink(currentUser);
+      } else {
+        updatePortalLink(null);
+      }
+
+      // Show AI doubt popup immediately
+      console.log('About to call showDoubtPopup');
+      showDoubtPopup();
+    });
+
+    // AI Doubt Popup Functions
+    function showDoubtPopup() {
+      console.log('showDoubtPopup called');
+      
+      // Temporarily disable the 24-hour check for debugging
+      // const lastDismissed = localStorage.getItem('aiDoubtPopupDismissed');
+      // const now = new Date().getTime();
+      
+      // if (lastDismissed && (now - parseInt(lastDismissed)) < 24 * 60 * 60 * 1000) {
+      //   console.log('Popup blocked by 24-hour rule');
+      //   return; // Don't show if dismissed within last 24 hours
+      // }
+
+      // Show popup immediately without any delay
+      const popup = document.getElementById('aiDoubtPopup');
+      console.log('Popup element found:', popup);
+      
+      if (popup) {
+        console.log('Adding show class to popup');
+        popup.classList.add('show');
+      } else {
+        console.error('Popup element not found!');
+      }
+      
+      // Start the inactivity timer for future popups
+      resetInactivityTimer();
+    }
+
+    function closeDoubtPopup() {
+      const popup = document.getElementById('aiDoubtPopup');
+      popup.classList.remove('show');
+      
+      // Store dismissal time
+      localStorage.setItem('aiDoubtPopupDismissed', new Date().getTime().toString());
+    }
+
+    function openAIChat() {
+      // Trigger the Chatbase widget
+      if (window.chatbase) {
+        window.chatbase('open');
+      }
+      closeDoubtPopup();
+    }
+
+    function remindLater() {
+      // Set reminder for 2 hours later
+      const twoHoursLater = new Date().getTime() + (2 * 60 * 60 * 1000);
+      localStorage.setItem('aiDoubtPopupDismissed', twoHoursLater.toString());
+      closeDoubtPopup();
+    }
+
+    // Show popup when user seems stuck (no activity for 2 minutes)
+    let inactivityTimer;
+    let hasShownInactivityPopup = false;
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      
+      if (!hasShownInactivityPopup) {
+        inactivityTimer = setTimeout(() => {
+          const popup = document.getElementById('aiDoubtPopup');
+          if (!popup.classList.contains('show')) {
+            popup.classList.add('show');
+            hasShownInactivityPopup = true;
+          }
+        }, 120000); // 2 minutes
+      }
+    }
+
+    // Track user activity
+    document.addEventListener('mousemove', resetInactivityTimer);
+    document.addEventListener('keypress', resetInactivityTimer);
+    document.addEventListener('scroll', resetInactivityTimer);
+    document.addEventListener('click', resetInactivityTimer);
+
+    // Close profile modal when clicking outside
+    document.getElementById('profileModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeProfileModal();
+      }
+    });
+  </script>
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="app.js"></script>
+    <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="-JS4MRePUHevy05CT-gZR";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+  </body>
+</html>

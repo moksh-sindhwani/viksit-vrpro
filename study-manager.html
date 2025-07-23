@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Class - Study Manager</title>
+    <link rel="icon" href="Apple vision canvas images/favicon.png" type="image/x-icon" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Styles */
+        nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            transform: translateY(-2px);
+        }
+
+        .profile-btn {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-btn:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .main-dashboard {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: #00ff88;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #00ff88;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Classes Section */
+        .classes-section {
+            margin-top: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #00ff88;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .class-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: #00ff88;
+        }
+
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .class-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000;
+        }
+
+        .class-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .status-in-progress {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .status-upcoming {
+            background: rgba(66, 165, 245, 0.2);
+            color: #42a5f5;
+            border: 1px solid #42a5f5;
+        }
+
+        .class-title {
+            font-size: 1.2rem;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .class-description {
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .class-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            transition: width 0.3s ease;
+        }
+
+        .class-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Study Schedule */
+        .schedule-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 3rem;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .day-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .day-card:hover {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: #00ff88;
+        }
+
+        .day-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #00ff88;
+        }
+
+        .day-classes {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-sidebar {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .stat-card {
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .classes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .class-actions {
+                flex-direction: column;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .class-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .class-card:nth-child(1) { animation-delay: 0.1s; }
+        .class-card:nth-child(2) { animation-delay: 0.2s; }
+        .class-card:nth-child(3) { animation-delay: 0.3s; }
+        .class-card:nth-child(4) { animation-delay: 0.4s; }
+        .class-card:nth-child(5) { animation-delay: 0.5s; }
+        .class-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">VR CLASS</a>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="Viksit.html">Courses</a></li>
+                <li><a href="viksitVR.html">VR Experience</a></li>
+                <li><a href="todo.html">Tasks</a></li>
+                <li><a href="test.html">Tests</a></li>
+                <li><a href="study-manager.html">Study Manager</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+
+            <button class="profile-btn" onclick="checkLoginAndRedirect()">
+                <span>👤</span>
+                <span id="navProfileName">Login</span>
+            </button>
+
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                ☰
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Study Manager</h1>
+            <p class="page-subtitle">Track your VR learning progress and manage your study schedule</p>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <div class="main-dashboard">
+                <h2 class="chart-title">Learning Progress Overview</h2>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                    <div style="background: rgba(0, 255, 136, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.5rem; color: #00ff88; font-weight: bold;" id="weeklyHours">12h</div>
+                        <div style="opacity: 0.8; font-size: 0.9rem;">This Week</div>
+                    </div>
+                    <div style="background: rgba(66, 165, 245, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.5rem; color: #42a5f5; font-weight: bold;" id="streakDays">7</div>
+                        <div style="opacity: 0.8; font-size: 0.9rem;">Day Streak</div>
+                    </div>
+                    <div style="background: rgba(255, 193, 7, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.5rem; color: #ffc107; font-weight: bold;" id="averageScore">85%</div>
+                        <div style="opacity: 0.8; font-size: 0.9rem;">Avg Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-sidebar">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-number" id="totalClasses">12</div>
+                    <div class="stat-label">Total Classes</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="completedClasses">8</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-number" id="inProgressClasses">3</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-number" id="upcomingClasses">1</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classes Section -->
+        <div class="classes-section">
+            <h2 class="section-title">Classes Conducted</h2>
+            <div class="classes-grid" id="classesGrid">
+                <!-- Classes will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Study Schedule -->
+        <div class="schedule-section">
+            <h2 class="section-title">Weekly Study Schedule</h2>
+            <div class="schedule-grid" id="scheduleGrid">
+                <!-- Schedule will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample study data
+        const studyData = {
+            classes: [
+                {
+                    id: 1,
+                    title: "VR Fundamentals",
+                    description: "Introduction to Virtual Reality technology, hardware, and basic concepts.",
+                    icon: "🥽",
+                    status: "completed",
+                    progress: 100,
+                    duration: "2h 30m",
+                    date: "2025-07-15",
+                    instructor: "Dr. Smith",
+                    score: 92
+                },
+                {
+                    id: 2,
+                    title: "3D Modeling Basics",
+                    description: "Learn basic 3D modeling techniques using Blender and Maya.",
+                    icon: "🎨",
+                    status: "completed",
+                    progress: 100,
+                    duration: "3h 15m",
+                    date: "2025-07-16",
+                    instructor: "Prof. Johnson",
+                    score: 88
+                },
+                {
+                    id: 3,
+                    title: "Interactive Design",
+                    description: "UI/UX principles for VR environments and user interaction design.",
+                    icon: "🎯",
+                    status: "completed",
+                    progress: 100,
+                    duration: "2h 45m",
+                    date: "2025-07-17",
+                    instructor: "Ms. Davis",
+                    score: 95
+                },
+                {
+                    id: 4,
+                    title: "Physics Simulation",
+                    description: "Understanding physics engines and realistic movement in VR.",
+                    icon: "⚛️",
+                    status: "in-progress",
+                    progress: 75,
+                    duration: "4h 00m",
+                    date: "2025-07-18",
+                    instructor: "Dr. Wilson",
+                    score: null
+                },
+                {
+                    id: 5,
+                    title: "Animation Techniques",
+                    description: "Creating smooth animations and transitions in virtual environments.",
+                    icon: "🎬",
+                    status: "in-progress",
+                    progress: 45,
+                    duration: "3h 30m",
+                    date: "2025-07-19",
+                    instructor: "Mr. Brown",
+                    score: null
+                },
+                {
+                    id: 6,
+                    title: "Sound Design for VR",
+                    description: "3D audio implementation and spatial sound design principles.",
+                    icon: "🎵",
+                    status: "in-progress",
+                    progress: 20,
+                    duration: "2h 15m",
+                    date: "2025-07-20",
+                    instructor: "Ms. Taylor",
+                    score: null
+                },
+                {
+                    id: 7,
+                    title: "Advanced Scripting",
+                    description: "Programming complex interactions and behaviors in VR applications.",
+                    icon: "💻",
+                    status: "upcoming",
+                    progress: 0,
+                    duration: "5h 00m",
+                    date: "2025-07-22",
+                    instructor: "Dr. Anderson",
+                    score: null
+                }
+            ],
+            weeklySchedule: [
+                { day: "Monday", classes: ["VR Fundamentals", "3D Modeling"] },
+                { day: "Tuesday", classes: ["Interactive Design", "Physics Sim"] },
+                { day: "Wednesday", classes: ["Animation Tech", "Sound Design"] },
+                { day: "Thursday", classes: ["Advanced Scripting", "Testing"] },
+                { day: "Friday", classes: ["Project Work", "Review"] },
+                { day: "Saturday", classes: ["Workshop", "Q&A Session"] },
+                { day: "Sunday", classes: ["Free Study", "Practice"] }
+            ]
+        };
+
+        let progressChart;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadClasses();
+            loadSchedule();
+            updateStats();
+            createProgressChart();
+            checkUserLogin();
+        });
+
+        function loadClasses() {
+            const classesGrid = document.getElementById('classesGrid');
+            classesGrid.innerHTML = '';
+
+            studyData.classes.forEach(classItem => {
+                const classCard = createClassCard(classItem);
+                classesGrid.appendChild(classCard);
+            });
+        }
+
+        function createClassCard(classItem) {
+            const card = document.createElement('div');
+            card.className = 'class-card';
+            
+            const statusClass = {
+                'completed': 'status-completed',
+                'in-progress': 'status-in-progress',
+                'upcoming': 'status-upcoming'
+            }[classItem.status];
+
+            const statusText = {
+                'completed': 'Completed',
+                'in-progress': 'In Progress',
+                'upcoming': 'Upcoming'
+            }[classItem.status];
+
+            card.innerHTML = `
+                <div class="class-header">
+                    <div class="class-icon">${classItem.icon}</div>
+                    <div class="class-status ${statusClass}">${statusText}</div>
+                </div>
+                
+                <h3 class="class-title">${classItem.title}</h3>
+                <p class="class-description">${classItem.description}</p>
+                
+                <div class="class-meta">
+                    <span><strong>Duration:</strong> ${classItem.duration}</span>
+                    <span><strong>Date:</strong> ${new Date(classItem.date).toLocaleDateString()}</span>
+                </div>
+                <div class="class-meta">
+                    <span><strong>Instructor:</strong> ${classItem.instructor}</span>
+                    ${classItem.score ? `<span><strong>Score:</strong> ${classItem.score}%</span>` : '<span><strong>Score:</strong> Pending</span>'}
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${classItem.progress}%"></div>
+                </div>
+                <div style="text-align: center; margin-bottom: 1rem; font-size: 0.9rem; color: #00ff88;">
+                    Progress: ${classItem.progress}%
+                </div>
+                
+                <div class="class-actions">
+                    ${classItem.status === 'completed' ? `
+                        <button class="btn btn-secondary" onclick="reviewClass(${classItem.id})">Review</button>
+                        <button class="btn btn-secondary" onclick="downloadCertificate(${classItem.id})">Certificate</button>
+                    ` : classItem.status === 'in-progress' ? `
+                        <button class="btn btn-primary" onclick="continueClass(${classItem.id})">Continue</button>
+                        <button class="btn btn-secondary" onclick="viewMaterials(${classItem.id})">Materials</button>
+                    ` : `
+                        <button class="btn btn-secondary" onclick="previewClass(${classItem.id})">Preview</button>
+                        <button class="btn btn-secondary" onclick="scheduleClass(${classItem.id})">Schedule</button>
+                    `}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function loadSchedule() {
+            const scheduleGrid = document.getElementById('scheduleGrid');
+            scheduleGrid.innerHTML = '';
+
+            studyData.weeklySchedule.forEach(day => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+                dayCard.innerHTML = `
+                    <div class="day-name">${day.day}</div>
+                    <div class="day-classes">${day.classes.join('<br>')}</div>
+                `;
+                scheduleGrid.appendChild(dayCard);
+            });
+        }
+
+        function updateStats() {
+            const completed = studyData.classes.filter(c => c.status === 'completed');
+            const inProgress = studyData.classes.filter(c => c.status === 'in-progress');
+            const upcoming = studyData.classes.filter(c => c.status === 'upcoming');
+
+            document.getElementById('totalClasses').textContent = studyData.classes.length;
+            document.getElementById('completedClasses').textContent = completed.length;
+            document.getElementById('inProgressClasses').textContent = inProgress.length;
+            document.getElementById('upcomingClasses').textContent = upcoming.length;
+
+            // Calculate average score
+            const scores = completed.filter(c => c.score).map(c => c.score);
+            const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+            document.getElementById('averageScore').textContent = avgScore + '%';
+        }
+
+        function createProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            const completed = studyData.classes.filter(c => c.status === 'completed').length;
+            const inProgress = studyData.classes.filter(c => c.status === 'in-progress').length;
+            const upcoming = studyData.classes.filter(c => c.status === 'upcoming').length;
+
+            progressChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Upcoming'],
+                    datasets: [{
+                        data: [completed, inProgress, upcoming],
+                        backgroundColor: [
+                            'rgba(0, 255, 136, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(66, 165, 245, 0.8)'
+                        ],
+                        borderColor: [
+                            '#00ff88',
+                            '#ffc107',
+                            '#42a5f5'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#00ff88',
+                            bodyColor: 'white',
+                            borderColor: '#00ff88',
+                            borderWidth: 1
+                        }
+                    },
+                    elements: {
+                        arc: {
+                            borderWidth: 0
+                        }
+                    }
+                }
+            });
+        }
+
+        // Class action functions
+        function reviewClass(classId) {
+            const classItem = studyData.classes.find(c => c.id === classId);
+            alert(`Review ${classItem.title}\n\nScore: ${classItem.score}%\nStatus: Completed\nDuration: ${classItem.duration}\n\nGreat job completing this class!`);
+        }
+
+        function downloadCertificate(classId) {
+            const classItem = studyData.classes.find(c => c.id === classId);
+            alert(`Certificate downloaded for ${classItem.title}!\n\nCongratulations on completing the course with a score of ${classItem.score}%.`);
+        }
+
+        function continueClass(classId) {
+            const classItem = studyData.classes.find(c => c.id === classId);
+            alert(`Continuing ${classItem.title}\n\nProgress: ${classItem.progress}%\nEstimated time remaining: ${Math.round((100 - classItem.progress) / 100 * parseInt(classItem.duration))} minutes`);
+        }
+
+        function viewMaterials(classId) {
+            const classItem = studyData.classes.find(c => c.id === classId);
+            alert(`Study materials for ${classItem.title}:\n\n• Lecture slides\n• Video tutorials\n• Practice exercises\n• Additional resources\n\nAccess these materials anytime!`);
+        }
+
+        function previewClass(classId) {
+            const classItem = studyData.classes.find(c => c.id === classId);
+            alert(`Preview of ${classItem.title}\n\n${classItem.description}\n\nDuration: ${classItem.duration}\nInstructor: ${classItem.instructor}\nScheduled: ${new Date(classItem.date).toLocaleDateString()}`);
+        }
+
+        function scheduleClass(classId) {
+            const classItem = studyData.classes.find(c => c.id === classId);
+            alert(`Schedule ${classItem.title}\n\nChoose your preferred time slot:\n• Morning (9:00 AM - 12:00 PM)\n• Afternoon (2:00 PM - 5:00 PM)\n• Evening (6:00 PM - 9:00 PM)`);
+        }
+
+        function checkUserLogin() {
+            const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+            const navProfileName = document.getElementById('navProfileName');
+            
+            if (currentUser) {
+                navProfileName.textContent = currentUser.name.split(' ')[0];
+            } else {
+                navProfileName.textContent = 'Login';
+            }
+        }
+
+        function checkLoginAndRedirect() {
+            const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+            if (currentUser) {
+                window.location.href = 'viksitVR.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '100%';
+                navLinks.style.left = '0';
+                navLinks.style.width = '100%';
+                navLinks.style.background = 'rgba(255, 255, 255, 0.1)';
+                navLinks.style.backdropFilter = 'blur(15px)';
+                navLinks.style.padding = '1rem';
+            }
+        }
+
+        // Auto-refresh stats every 30 seconds
+        setInterval(() => {
+            updateStats();
+        }, 30000);
+    </script>
+    <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="-JS4MRePUHevy05CT-gZR";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+</body>
+</html>

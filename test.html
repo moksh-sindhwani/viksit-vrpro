@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Class - Daily Quiz Tests</title>
+    <link rel="icon" href="Apple vision canvas images/favicon.png" type="image/x-icon" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Navigation Styles */
+        nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            transform: translateY(-2px);
+        }
+
+        .profile-btn {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-btn:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .date-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Quiz Grid */
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: #00ff88;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000;
+        }
+
+        .quiz-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-available {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .status-completed {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .status-locked {
+            background: rgba(255, 99, 99, 0.2);
+            color: #ff6363;
+            border: 1px solid #ff6363;
+        }
+
+        .quiz-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #00ff88;
+        }
+
+        .quiz-description {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Statistics Section */
+        .stats-section {
+            margin-top: 4rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #00ff88;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .quiz-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .quiz-card {
+                padding: 1.5rem;
+            }
+
+            .quiz-actions {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .quiz-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quiz-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .quiz-card:nth-child(1) { animation-delay: 0.1s; }
+        .quiz-card:nth-child(2) { animation-delay: 0.2s; }
+        .quiz-card:nth-child(3) { animation-delay: 0.3s; }
+        .quiz-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">VR CLASS</a>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="Viksit.html">Courses</a></li>
+                <li><a href="viksitVR.html">VR Experience</a></li>
+                <li><a href="todo.html">Tasks</a></li>
+                <li><a href="test.html">Tests</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+
+            <button class="profile-btn" onclick="checkLoginAndRedirect()">
+                <span>👤</span>
+                <span id="navProfileName">Login</span>
+            </button>
+
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                ☰
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Daily Quiz Tests</h1>
+            <p class="page-subtitle">Test your knowledge from today's VR classes</p>
+            <div class="date-info">
+                <strong>📅 Today:</strong> <span id="currentDate"></span>
+            </div>
+        </div>
+
+        <div class="quiz-grid" id="quizGrid">
+            <!-- Quiz cards will be dynamically loaded here -->
+        </div>
+
+        <div class="stats-section">
+            <h2 class="stats-title">Your Quiz Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalQuizzes">0</div>
+                    <div class="stat-label">Total Quizzes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedQuizzes">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="averageScore">0%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="streakCount">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 10000; display: flex; justify-content: center; align-items: center;">
+        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 3rem; max-width: 600px; width: 90%; border: 1px solid rgba(255, 255, 255, 0.2); position: relative;">
+            <button onclick="closeQuizModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">×</button>
+            
+            <div id="quizContent">
+                <h2 id="quizModalTitle" style="color: #00ff88; margin-bottom: 2rem; text-align: center;">Quiz Title</h2>
+                <div id="questionContainer"></div>
+                <div id="quizActions" style="margin-top: 2rem; text-align: center;">
+                    <button class="btn btn-primary" onclick="submitQuiz()">Submit Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample quiz data for today's classes
+        const todayQuizzes = [
+            {
+                id: 1,
+                title: "Virtual Reality Fundamentals",
+                description: "Test your understanding of VR basics, headset technology, and immersive experiences covered in today's session.",
+                subject: "VR Technology",
+                duration: "15 min",
+                questions: 10,
+                difficulty: "Beginner",
+                status: "available",
+                icon: "🥽",
+                questions_data: [
+                    {
+                        question: "What does VR stand for?",
+                        options: ["Virtual Reality", "Visual Recognition", "Voice Recording", "Video Rendering"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which component is essential for VR immersion?",
+                        options: ["Speakers", "Head-mounted display", "Keyboard", "Mouse"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the recommended frame rate for VR to avoid motion sickness?",
+                        options: ["30 FPS", "60 FPS", "90 FPS", "120 FPS"],
+                        correct: 2
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "3D Modeling Basics",
+                description: "Quiz on 3D modeling principles, coordinate systems, and basic mesh manipulation techniques.",
+                subject: "3D Design",
+                duration: "20 min",
+                questions: 15,
+                difficulty: "Intermediate",
+                status: "available",
+                icon: "🎨",
+                questions_data: [
+                    {
+                        question: "What are the three axes in 3D space?",
+                        options: ["X, Y, Z", "A, B, C", "1, 2, 3", "R, G, B"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which tool is commonly used for 3D modeling?",
+                        options: ["Notepad", "Blender", "Calculator", "Paint"],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Interactive Design Principles",
+                description: "Assessment of user interface design concepts and interaction patterns in VR environments.",
+                subject: "UI/UX Design",
+                duration: "25 min",
+                questions: 12,
+                difficulty: "Advanced",
+                status: "completed",
+                score: 85,
+                icon: "🎯",
+                questions_data: []
+            },
+            {
+                id: 4,
+                title: "Physics in Virtual Worlds",
+                description: "Understanding physics simulation, collision detection, and realistic movement in VR spaces.",
+                subject: "VR Physics",
+                duration: "30 min",
+                questions: 20,
+                difficulty: "Advanced",
+                status: "locked",
+                icon: "⚛️",
+                questions_data: []
+            }
+        ];
+
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            loadQuizzes();
+            updateStats();
+            checkUserLogin();
+        });
+
+        function updateCurrentDate() {
+            const today = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        function loadQuizzes() {
+            const quizGrid = document.getElementById('quizGrid');
+            quizGrid.innerHTML = '';
+
+            todayQuizzes.forEach(quiz => {
+                const quizCard = createQuizCard(quiz);
+                quizGrid.appendChild(quizCard);
+            });
+        }
+
+        function createQuizCard(quiz) {
+            const card = document.createElement('div');
+            card.className = 'quiz-card';
+            
+            const statusClass = {
+                'available': 'status-available',
+                'completed': 'status-completed',
+                'locked': 'status-locked'
+            }[quiz.status];
+
+            const statusText = {
+                'available': 'Available',
+                'completed': 'Completed',
+                'locked': 'Locked'
+            }[quiz.status];
+
+            card.innerHTML = `
+                <div class="quiz-header">
+                    <div class="quiz-icon">${quiz.icon}</div>
+                    <div class="quiz-status ${statusClass}">${statusText}</div>
+                </div>
+                
+                <h3 class="quiz-title">${quiz.title}</h3>
+                <p class="quiz-description">${quiz.description}</p>
+                
+                <div class="quiz-meta">
+                    <span><strong>Subject:</strong> ${quiz.subject}</span>
+                    <span><strong>Duration:</strong> ${quiz.duration}</span>
+                </div>
+                <div class="quiz-meta">
+                    <span><strong>Questions:</strong> ${quiz.questions}</span>
+                    <span><strong>Level:</strong> ${quiz.difficulty}</span>
+                </div>
+                
+                ${quiz.status === 'completed' ? `
+                    <div style="text-align: center; margin: 1rem 0; padding: 1rem; background: rgba(255, 193, 7, 0.1); border-radius: 10px; border: 1px solid #ffc107;">
+                        <strong style="color: #ffc107;">Score: ${quiz.score}%</strong>
+                    </div>
+                ` : ''}
+                
+                <div class="quiz-actions">
+                    ${quiz.status === 'available' ? `
+                        <button class="btn btn-primary" onclick="startQuiz(${quiz.id})">Start Quiz</button>
+                        <button class="btn btn-secondary" onclick="previewQuiz(${quiz.id})">Preview</button>
+                    ` : quiz.status === 'completed' ? `
+                        <button class="btn btn-secondary" onclick="reviewQuiz(${quiz.id})">Review</button>
+                        <button class="btn btn-secondary" onclick="retakeQuiz(${quiz.id})">Retake</button>
+                    ` : `
+                        <button class="btn btn-secondary" disabled>Complete Prerequisites</button>
+                    `}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function startQuiz(quizId) {
+            const quiz = todayQuizzes.find(q => q.id === quizId);
+            if (!quiz || quiz.status !== 'available') return;
+
+            currentQuiz = quiz;
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            
+            showQuizModal();
+            displayQuestion();
+        }
+
+        function previewQuiz(quizId) {
+            const quiz = todayQuizzes.find(q => q.id === quizId);
+            if (!quiz) return;
+
+            alert(`Quiz Preview:\n\nTitle: ${quiz.title}\nSubject: ${quiz.subject}\nQuestions: ${quiz.questions}\nDuration: ${quiz.duration}\nDifficulty: ${quiz.difficulty}\n\nDescription: ${quiz.description}`);
+        }
+
+        function reviewQuiz(quizId) {
+            alert('Quiz review feature coming soon!');
+        }
+
+        function retakeQuiz(quizId) {
+            if (confirm('Are you sure you want to retake this quiz? Your previous score will be replaced.')) {
+                const quiz = todayQuizzes.find(q => q.id === quizId);
+                quiz.status = 'available';
+                delete quiz.score;
+                loadQuizzes();
+            }
+        }
+
+        function showQuizModal() {
+            document.getElementById('quizModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quizModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentQuiz = null;
+        }
+
+        function displayQuestion() {
+            if (!currentQuiz || currentQuestionIndex >= currentQuiz.questions_data.length) {
+                finishQuiz();
+                return;
+            }
+
+            const question = currentQuiz.questions_data[currentQuestionIndex];
+            document.getElementById('quizModalTitle').textContent = `${currentQuiz.title} - Question ${currentQuestionIndex + 1}/${currentQuiz.questions_data.length}`;
+            
+            const questionContainer = document.getElementById('questionContainer');
+            questionContainer.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: white; margin-bottom: 1.5rem; font-size: 1.2rem;">${question.question}</h3>
+                    <div style="display: grid; gap: 1rem;">
+                        ${question.options.map((option, index) => `
+                            <label style="display: flex; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 10px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(0, 255, 136, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                                <input type="radio" name="answer" value="${index}" style="margin-right: 1rem;">
+                                <span style="color: white;">${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('quizActions').innerHTML = `
+                <button class="btn btn-secondary" onclick="previousQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Previous</button>
+                <button class="btn btn-primary" onclick="nextQuestion()">
+                    ${currentQuestionIndex === currentQuiz.questions_data.length - 1 ? 'Finish Quiz' : 'Next Question'}
+                </button>
+            `;
+        }
+
+        function nextQuestion() {
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (!selectedAnswer) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            userAnswers[currentQuestionIndex] = parseInt(selectedAnswer.value);
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+                
+                // Restore previous answer if exists
+                if (userAnswers[currentQuestionIndex] !== undefined) {
+                    const radio = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
+                    if (radio) radio.checked = true;
+                }
+            }
+        }
+
+        function finishQuiz() {
+            if (!currentQuiz) return;
+
+            // Calculate score
+            let correctAnswers = 0;
+            currentQuiz.questions_data.forEach((question, index) => {
+                if (userAnswers[index] === question.correct) {
+                    correctAnswers++;
+                }
+            });
+
+            const score = Math.round((correctAnswers / currentQuiz.questions_data.length) * 100);
+            
+            // Update quiz status
+            currentQuiz.status = 'completed';
+            currentQuiz.score = score;
+
+            // Show results
+            document.getElementById('questionContainer').innerHTML = `
+                <div style="text-align: center;">
+                    <h2 style="color: #00ff88; margin-bottom: 1rem;">Quiz Completed!</h2>
+                    <div style="font-size: 3rem; margin: 2rem 0;">${score >= 80 ? '🎉' : score >= 60 ? '👍' : '📚'}</div>
+                    <div style="font-size: 2rem; color: #00ff88; margin-bottom: 1rem;">${score}%</div>
+                    <p style="color: white; margin-bottom: 2rem;">
+                        You got ${correctAnswers} out of ${currentQuiz.questions_data.length} questions correct.
+                        ${score >= 80 ? 'Excellent work!' : score >= 60 ? 'Good job!' : 'Keep studying!'}
+                    </p>
+                </div>
+            `;
+
+            document.getElementById('quizActions').innerHTML = `
+                <button class="btn btn-primary" onclick="closeQuizModal(); loadQuizzes(); updateStats();">Continue</button>
+            `;
+
+            // Save to localStorage
+            saveQuizProgress();
+        }
+
+        function updateStats() {
+            const completed = todayQuizzes.filter(q => q.status === 'completed');
+            const totalScore = completed.reduce((sum, q) => sum + (q.score || 0), 0);
+            const avgScore = completed.length > 0 ? Math.round(totalScore / completed.length) : 0;
+
+            document.getElementById('totalQuizzes').textContent = todayQuizzes.length;
+            document.getElementById('completedQuizzes').textContent = completed.length;
+            document.getElementById('averageScore').textContent = avgScore + '%';
+            document.getElementById('streakCount').textContent = getStreakCount();
+        }
+
+        function getStreakCount() {
+            // Simple streak calculation - could be enhanced with actual date tracking
+            const completed = todayQuizzes.filter(q => q.status === 'completed');
+            return completed.length > 0 ? Math.min(completed.length, 7) : 0;
+        }
+
+        function saveQuizProgress() {
+            localStorage.setItem('vrClassQuizProgress', JSON.stringify(todayQuizzes));
+        }
+
+        function loadQuizProgress() {
+            const saved = localStorage.getItem('vrClassQuizProgress');
+            if (saved) {
+                const savedQuizzes = JSON.parse(saved);
+                // Merge with current quizzes
+                savedQuizzes.forEach(savedQuiz => {
+                    const currentQuiz = todayQuizzes.find(q => q.id === savedQuiz.id);
+                    if (currentQuiz && savedQuiz.status === 'completed') {
+                        currentQuiz.status = savedQuiz.status;
+                        currentQuiz.score = savedQuiz.score;
+                    }
+                });
+            }
+        }
+
+        function checkUserLogin() {
+            const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+            const navProfileName = document.getElementById('navProfileName');
+            
+            if (currentUser) {
+                navProfileName.textContent = currentUser.name.split(' ')[0];
+            } else {
+                navProfileName.textContent = 'Login';
+            }
+        }
+
+        function checkLoginAndRedirect() {
+            const currentUser = JSON.parse(localStorage.getItem('vrClassCurrentUser') || 'null');
+            if (currentUser) {
+                window.location.href = 'viksitVR.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            // Mobile menu toggle functionality
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '100%';
+                navLinks.style.left = '0';
+                navLinks.style.width = '100%';
+                navLinks.style.background = 'rgba(255, 255, 255, 0.1)';
+                navLinks.style.backdropFilter = 'blur(15px)';
+                navLinks.style.padding = '1rem';
+            }
+        }
+
+        // Load saved progress on page load
+        loadQuizProgress();
+    </script>
+    <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="-JS4MRePUHevy05CT-gZR";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+</body>
+</html>
