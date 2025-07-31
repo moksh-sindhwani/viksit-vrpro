@@ -1,0 +1,512 @@
+/* Chemistry Lab VR Styles */
+
+/* Advanced Chemical Equipment Styling */
+.chemical-container {
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 1rem 0;
+    border: 2px solid rgba(0, 255, 136, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+/* Crystal Animation Effects */
+@keyframes crystallize {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 1;
+        filter: brightness(1);
+    }
+    50% {
+        opacity: 0.7;
+        filter: brightness(1.5) hue-rotate(30deg);
+    }
+}
+
+.crystal-formation {
+    animation: crystallize 2s ease-out;
+}
+
+.crystal-sparkle {
+    animation: sparkle 1s ease-in-out infinite;
+}
+
+/* Temperature Gradient Effects */
+.temperature-gradient {
+    background: linear-gradient(45deg, 
+        #ff6b6b 0%, 
+        #feca57 25%, 
+        #48cae4 50%, 
+        #4ecdc4 75%, 
+        #45b7d1 100%);
+    background-size: 200% 200%;
+    animation: temperatureShift 3s ease-in-out infinite;
+}
+
+@keyframes temperatureShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Bubbling Effect for Solutions */
+@keyframes bubble {
+    0% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translateY(-20px) scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-40px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+.solution-bubble {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(65, 105, 225, 0.8);
+    border-radius: 50%;
+    animation: bubble 2s linear infinite;
+}
+
+.solution-bubble:nth-child(2) { animation-delay: 0.5s; }
+.solution-bubble:nth-child(3) { animation-delay: 1s; }
+.solution-bubble:nth-child(4) { animation-delay: 1.5s; }
+
+/* Flame Effect */
+@keyframes flameFlicker {
+    0%, 100% {
+        transform: scale(1) rotate(-2deg);
+        filter: hue-rotate(0deg);
+    }
+    25% {
+        transform: scale(1.1) rotate(1deg);
+        filter: hue-rotate(10deg);
+    }
+    50% {
+        transform: scale(1.05) rotate(-1deg);
+        filter: hue-rotate(-5deg);
+    }
+    75% {
+        transform: scale(1.08) rotate(2deg);
+        filter: hue-rotate(15deg);
+    }
+}
+
+.flame-effect {
+    animation: flameFlicker 0.3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px #ff4500);
+}
+
+/* Chemical Reaction Particle Effects */
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0px) translateX(0px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) translateX(20px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.reaction-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #00ff88;
+    border-radius: 50%;
+    animation: particleFloat 3s linear infinite;
+}
+
+/* Equipment Glow Effects */
+.equipment-active {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    border-color: #00ff88;
+    animation: equipmentPulse 2s ease-in-out infinite;
+}
+
+@keyframes equipmentPulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.9);
+    }
+}
+
+/* Solution Color Transitions */
+.copper-solution {
+    background: linear-gradient(135deg, #4169E1, #1E90FF);
+    transition: all 1s ease-in-out;
+}
+
+.copper-solution.heated {
+    background: linear-gradient(135deg, #6A5ACD, #4169E1);
+    animation: solutionHeat 2s ease-in-out infinite;
+}
+
+@keyframes solutionHeat {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.3) saturate(1.2);
+    }
+}
+
+.copper-solution.concentrated {
+    background: linear-gradient(135deg, #191970, #4169E1);
+    opacity: 0.9;
+}
+
+/* Progress Indicators with Chemical Theme */
+.chemical-progress {
+    position: relative;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 255, 136, 0.1) 20%, 
+        rgba(0, 255, 136, 0.3) 50%, 
+        rgba(0, 255, 136, 0.1) 80%, 
+        transparent 100%);
+    animation: progressFlow 3s linear infinite;
+}
+
+@keyframes progressFlow {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+/* Molecular Structure Visualization */
+.molecule-bond {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, #fff, #00ff88);
+    animation: bondVibration 1s ease-in-out infinite;
+}
+
+@keyframes bondVibration {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(1.1); }
+}
+
+.atom-copper {
+    background: radial-gradient(circle, #B87333, #CD853F);
+    border: 2px solid #8B4513;
+    animation: atomRotation 4s linear infinite;
+}
+
+.atom-sulfur {
+    background: radial-gradient(circle, #FFFF00, #FFD700);
+    border: 2px solid #FFA500;
+    animation: atomRotation 3s linear infinite reverse;
+}
+
+.atom-oxygen {
+    background: radial-gradient(circle, #FF0000, #FF6347);
+    border: 2px solid #DC143C;
+    animation: atomRotation 2s linear infinite;
+}
+
+@keyframes atomRotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Safety Equipment Highlights */
+.safety-equipment {
+    border: 3px solid #FFC107;
+    background: rgba(255, 193, 7, 0.1);
+    animation: safetyBlink 2s ease-in-out infinite;
+}
+
+@keyframes safetyBlink {
+    0%, 100% { 
+        border-color: #FFC107;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    50% { 
+        border-color: #FF5722;
+        box-shadow: 0 0 15px rgba(255, 87, 34, 0.7);
+    }
+}
+
+/* Interactive Tooltip Enhancements */
+.lab-tooltip-enhanced {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #00ff88;
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    animation: tooltipEntrance 0.4s ease-out;
+}
+
+@keyframes tooltipEntrance {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Chemical Formula Display */
+.chemical-formula {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #00ff88;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    animation: formulaGlow 3s ease-in-out infinite;
+}
+
+@keyframes formulaGlow {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+    }
+}
+
+.subscript {
+    font-size: 0.7em;
+    vertical-align: sub;
+}
+
+.superscript {
+    font-size: 0.7em;
+    vertical-align: super;
+}
+
+/* Temperature Display */
+.temperature-display {
+    background: linear-gradient(45deg, #ff4757, #ff3838);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: bold;
+    animation: temperaturePulse 2s ease-in-out infinite;
+}
+
+@keyframes temperaturePulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.05);
+        filter: brightness(1.2);
+    }
+}
+
+/* Crystal Structure Animation */
+.crystal-lattice {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.lattice-point {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #4169E1;
+    border-radius: 50%;
+    animation: latticeVibration 2s ease-in-out infinite;
+}
+
+@keyframes latticeVibration {
+    0%, 100% { transform: scale(1) translate(0, 0); }
+    50% { transform: scale(1.1) translate(1px, 1px); }
+}
+
+/* Equipment Status Indicators */
+.status-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-ready { background: #28a745; }
+.status-active { 
+    background: #ffc107; 
+    animation: statusBlink 1s ease-in-out infinite;
+}
+.status-complete { background: #17a2b8; }
+.status-error { 
+    background: #dc3545;
+    animation: statusBlink 0.5s ease-in-out infinite;
+}
+
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Measurement Units */
+.measurement-unit {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: normal;
+}
+
+/* Chemical Reaction Equation */
+.reaction-equation {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff88;
+    border-radius: 10px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    color: white;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.reaction-arrow {
+    color: #00ff88;
+    font-size: 1.5em;
+    animation: arrowPulse 2s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Phase Transition Indicators */
+.phase-solid { color: #8B4513; }
+.phase-liquid { color: #4169E1; }
+.phase-gas { color: #87CEEB; }
+.phase-aqueous { color: #00CED1; }
+
+/* Concentration Indicators */
+.concentration-bar {
+    height: 20px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(65, 105, 225, 0.3) 20%, 
+        rgba(65, 105, 225, 0.6) 50%, 
+        rgba(65, 105, 225, 0.9) 80%, 
+        #4169E1 100%);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.concentration-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+    animation: concentrationFlow 2s linear infinite;
+}
+
+@keyframes concentrationFlow {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* Responsive Design for Chemistry Lab */
+@media (max-width: 1200px) {
+    .lab-panel {
+        width: 300px;
+    }
+    
+    .equipment-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .chemical-container {
+        padding: 1rem;
+        margin: 0.5rem 0;
+    }
+    
+    .chemical-formula {
+        font-size: 0.9rem;
+    }
+    
+    .reaction-equation {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* High Contrast Mode for Accessibility */
+@media (prefers-contrast: high) {
+    .chemical-container {
+        border: 3px solid #ffffff;
+        background: #000000;
+    }
+    
+    .equipment-item {
+        border: 3px solid #ffffff;
+        background: #000000;
+    }
+    
+    .step-item {
+        border: 2px solid #ffffff;
+        background: #000000;
+    }
+}
+
+/* Reduced Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles for Lab Reports */
+@media print {
+    .lab-header,
+    .vr-ui,
+    .vr-scene {
+        display: none;
+    }
+    
+    .lab-panel {
+        width: 100%;
+        background: white;
+        color: black;
+    }
+    
+    .panel-section {
+        border: 1px solid black;
+        background: white;
+        page-break-inside: avoid;
+    }
+}

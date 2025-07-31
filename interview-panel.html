@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Job Interview Panel - Practice & Training | ViksitVR</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: black;
+            overflow-x: hidden;
+        }
+
+        /* Header Navigation */
+        .interview-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .interview-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .interview-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid white;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: white;
+            color: black;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Main Container */
+        .interview-container {
+            margin-top: 80px;
+            height: calc(100vh - 80px);
+            position: relative;
+            display: flex;
+        }
+
+        /* VR Scene */
+        .vr-scene {
+            flex: 1;
+            position: relative;
+        }
+
+        /* Control Panel */
+        .interview-panel {
+            width: 400px;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 2rem;
+            overflow-y: auto;
+            border-left: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .panel-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .panel-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Interview Setup */
+        .interview-setup {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .setup-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .setup-label {
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .setup-select, .setup-input {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 5px;
+            color: white;
+        }
+
+        .setup-select option {
+            background: #2c3e50;
+            color: white;
+        }
+
+        /* Question Panel */
+        .question-display {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .question-timer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .timer-circle {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        /* Performance Metrics */
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .metric-label {
+            color: #ecf0f1;
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .metric-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            transition: width 0.5s ease;
+        }
+
+        /* VR UI Controls */
+        .vr-ui {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .vr-button {
+            padding: 1rem 2rem;
+            background: rgba(52, 152, 219, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .vr-button:hover {
+            background: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .vr-button:disabled {
+            background: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Interview Status */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-waiting { background: #f39c12; }
+        .status-active { background: #e74c3c; animation: pulse 1s infinite; }
+        .status-complete { background: #27ae60; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Video Controls */
+        .video-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .video-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(52, 152, 219, 0.3);
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            color: #3498db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-subtext {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .interview-container {
+                flex-direction: column;
+            }
+            
+            .interview-panel {
+                width: 100%;
+                height: 40vh;
+            }
+            
+            .vr-scene {
+                height: 60vh;
+            }
+            
+            .interview-header {
+                padding: 0.5rem 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Recording Indicator */
+        .recording-indicator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1001;
+        }
+
+        .recording-dot {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        /* Feedback Panel */
+        .feedback-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #3498db;
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+            z-index: 10001;
+            display: none;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-title {
+            color: #3498db;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .feedback-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-section h3 {
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading VR Interview Panel...</div>
+        <div class="loading-subtext">Preparing Virtual Interview Environment</div>
+    </div>
+
+    <!-- Recording Indicator -->
+    <div class="recording-indicator" id="recordingIndicator">
+        <div class="recording-dot"></div>
+        <span>Recording Interview</span>
+    </div>
+
+    <!-- Header -->
+    <div class="interview-header">
+        <div class="interview-title">
+            🎯 VR Job Interview Panel - Practice & Training
+        </div>
+        <div class="interview-controls">
+            <a href="index.html" class="control-btn">🏠 Home</a>
+            <a href="viksitVR.html" class="control-btn">🎓 VR Portal</a>
+            <button class="control-btn" onclick="toggleVR()">🥽 Enter VR</button>
+            <button class="control-btn" onclick="startRecording()">📹 Record</button>
+            <button class="control-btn" onclick="resetInterview()">🔄 Reset</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="interview-container">
+        <!-- VR Scene -->
+        <div class="vr-scene">
+            <a-scene 
+                id="vrScene"
+                embedded 
+                style="height: 100%; width: 100%;"
+                vr-mode-ui="enabled: true"
+                device-orientation-permission-ui="enabled: true"
+                background="color: #f8f9fa"
+                fog="type: linear; color: #f8f9fa; near: 15; far: 50">
+                
+                <!-- Assets -->
+                <a-assets>
+                    <!-- Textures -->
+                    <img id="office-floor" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==">
+                    <img id="wood-texture" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==">
+                    
+                    <!-- Video Textures for Interviewers -->
+                    <video id="interviewer1-video" src="" preload="auto" loop muted crossorigin="anonymous"></video>
+                    <video id="interviewer2-video" src="" preload="auto" loop muted crossorigin="anonymous"></video>
+                    <video id="interviewer3-video" src="" preload="auto" loop muted crossorigin="anonymous"></video>
+                    
+                    <!-- Audio -->
+                    <audio id="ambient-office" preload="auto" loop>
+                        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+H5w2AcBiuJ0fPThTMGKHrJ7t+SPgo8lNvv12IcBzSE0fPRizAG" type="audio/wav">
+                    </audio>
+                </a-assets>
+
+                <!-- Lighting -->
+                <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
+                <a-light type="directional" position="5 8 5" target="#interview-table" color="#ffffff" intensity="0.8"></a-light>
+                <a-light type="point" position="0 3 0" color="#f39c12" intensity="0.3"></a-light>
+
+                <!-- Office Environment -->
+                <!-- Floor -->
+                <a-plane 
+                    position="0 0 0" 
+                    rotation="-90 0 0" 
+                    width="30" 
+                    height="30" 
+                    color="#e8e8e8" 
+                    material="roughness: 0.8">
+                </a-plane>
+
+                <!-- Walls -->
+                <a-plane position="0 5 -8" width="30" height="10" color="#ffffff"></a-plane>
+                <a-plane position="-15 5 0" rotation="0 90 0" width="16" height="10" color="#f8f9fa"></a-plane>
+                <a-plane position="15 5 0" rotation="0 -90 0" width="16" height="10" color="#f8f9fa"></a-plane>
+
+                <!-- Office Ceiling -->
+                <a-plane position="0 10 0" rotation="90 0 0" width="30" height="16" color="#ffffff"></a-plane>
+
+                <!-- Interview Table -->
+                <a-box 
+                    id="interview-table"
+                    position="0 0.8 -4" 
+                    width="3" 
+                    height="0.1" 
+                    depth="1.5" 
+                    color="#8B4513"
+                    material="roughness: 0.3; metalness: 0.1">
+                </a-box>
+
+                <!-- Table Legs -->
+                <a-cylinder position="-1.2 0.4 -3.5" radius="0.05" height="0.8" color="#666"></a-cylinder>
+                <a-cylinder position="1.2 0.4 -3.5" radius="0.05" height="0.8" color="#666"></a-cylinder>
+                <a-cylinder position="-1.2 0.4 -4.5" radius="0.05" height="0.8" color="#666"></a-cylinder>
+                <a-cylinder position="1.2 0.4 -4.5" radius="0.05" height="0.8" color="#666"></a-cylinder>
+
+                <!-- Interviewer Chairs -->
+                <!-- Chair 1 -->
+                <a-box position="-1 0.5 -5.5" width="0.6" height="0.1" depth="0.6" color="#2c3e50"></a-box>
+                <a-box position="-1 1.2 -5.8" width="0.6" height="0.8" depth="0.1" color="#2c3e50"></a-box>
+                
+                <!-- Chair 2 -->
+                <a-box position="0 0.5 -5.5" width="0.6" height="0.1" depth="0.6" color="#2c3e50"></a-box>
+                <a-box position="0 1.2 -5.8" width="0.6" height="0.8" depth="0.1" color="#2c3e50"></a-box>
+                
+                <!-- Chair 3 -->
+                <a-box position="1 0.5 -5.5" width="0.6" height="0.1" depth="0.6" color="#2c3e50"></a-box>
+                <a-box position="1 1.2 -5.8" width="0.6" height="0.8" depth="0.1" color="#2c3e50"></a-box>
+
+                <!-- Virtual Interviewers (Video Planes) -->
+                <!-- Interviewer 1 - HR Manager -->
+                <a-plane 
+                    id="interviewer1"
+                    position="-1 1.8 -5.5" 
+                    width="0.8" 
+                    height="1.2" 
+                    material="src: #interviewer1-video; transparent: true"
+                    rotation="0 0 0"
+                    class="interviewer clickable">
+                </a-plane>
+
+                <!-- Interviewer 2 - Technical Lead -->
+                <a-plane 
+                    id="interviewer2"
+                    position="0 1.8 -5.5" 
+                    width="0.8" 
+                    height="1.2" 
+                    material="src: #interviewer2-video; transparent: true"
+                    rotation="0 0 0"
+                    class="interviewer clickable">
+                </a-plane>
+
+                <!-- Interviewer 3 - Department Manager -->
+                <a-plane 
+                    id="interviewer3"
+                    position="1 1.8 -5.5" 
+                    width="0.8" 
+                    height="1.2" 
+                    material="src: #interviewer3-video; transparent: true"
+                    rotation="0 0 0"
+                    class="interviewer clickable">
+                </a-plane>
+
+                <!-- Name Plates -->
+                <a-text 
+                    value="Sarah Johnson\nHR Manager" 
+                    position="-1 0.9 -3.8" 
+                    align="center" 
+                    color="#2c3e50"
+                    scale="0.5 0.5 0.5">
+                </a-text>
+                <a-text 
+                    value="Alex Chen\nTechnical Lead" 
+                    position="0 0.9 -3.8" 
+                    align="center" 
+                    color="#2c3e50"
+                    scale="0.5 0.5 0.5">
+                </a-text>
+                <a-text 
+                    value="Maria Rodriguez\nDept. Manager" 
+                    position="1 0.9 -3.8" 
+                    align="center" 
+                    color="#2c3e50"
+                    scale="0.5 0.5 0.5">
+                </a-text>
+
+                <!-- Candidate Chair -->
+                <a-box position="0 0.5 -2.5" width="0.6" height="0.1" depth="0.6" color="#3498db"></a-box>
+                <a-box position="0 1.2 -2.2" width="0.6" height="0.8" depth="0.1" color="#3498db"></a-box>
+
+                <!-- Office Decorations -->
+                <!-- Whiteboard -->
+                <a-plane position="3 2.5 -7.5" width="2" height="1.5" color="#ffffff" 
+                         material="roughness: 0.1" rotation="0 -15 0"></a-plane>
+
+                <!-- Office Plants -->
+                <a-cylinder position="-2.5 0.3 -6" radius="0.2" height="0.6" color="#8B4513"></a-cylinder>
+                <a-sphere position="-2.5 0.8 -6" radius="0.3" color="#228B22"></a-sphere>
+                
+                <a-cylinder position="2.5 0.3 -6" radius="0.2" height="0.6" color="#8B4513"></a-cylinder>
+                <a-sphere position="2.5 0.8 -6" radius="0.3" color="#228B22"></a-sphere>
+
+                <!-- Bookshelf -->
+                <a-box position="-4 1.5 -7" width="0.3" height="3" depth="2" color="#8B4513"></a-box>
+                
+                <!-- Books -->
+                <a-box position="-3.9 1 -7.5" width="0.05" height="0.3" depth="0.2" color="#e74c3c"></a-box>
+                <a-box position="-3.9 1 -7.3" width="0.05" height="0.3" depth="0.2" color="#3498db"></a-box>
+                <a-box position="-3.9 1 -7.1" width="0.05" height="0.3" depth="0.2" color="#f39c12"></a-box>
+
+                <!-- Window -->
+                <a-plane position="4 2.5 -7.5" width="2" height="2" color="#87CEEB" 
+                         material="opacity: 0.7; transparent: true" rotation="0 -15 0"></a-plane>
+
+                <!-- Office Lighting -->
+                <a-box position="0 2.8 -4" width="1.5" height="0.1" depth="0.5" color="#f8f9fa"></a-box>
+
+                <!-- Conference Phone -->
+                <a-cylinder position="0 0.9 -4" radius="0.15" height="0.05" color="#2c3e50"></a-cylinder>
+
+                <!-- Laptops on Table -->
+                <a-box position="-0.8 0.87 -4.2" width="0.3" height="0.02" depth="0.4" color="#2c3e50"></a-box>
+                <a-box position="0.8 0.87 -4.2" width="0.3" height="0.02" depth="0.4" color="#2c3e50"></a-box>
+
+                <!-- Papers and Documents -->
+                <a-plane position="-0.3 0.86 -3.8" width="0.2" height="0.3" color="#ffffff" rotation="-90 0 15"></a-plane>
+                <a-plane position="0.3 0.86 -3.8" width="0.2" height="0.3" color="#ffffff" rotation="-90 0 -15"></a-plane>
+
+                <!-- Camera/User Position -->
+                <a-camera 
+                    id="userCamera"
+                    position="0 1.6 0" 
+                    look-controls="enabled: true" 
+                    wasd-controls="enabled: true"
+                    cursor="rayOrigin: mouse; fuse: false"
+                    raycaster="objects: .clickable">
+                </a-camera>
+
+                <!-- Sky -->
+                <a-sky color="#f8f9fa"></a-sky>
+            </a-scene>
+
+            <!-- VR UI Controls -->
+            <div class="vr-ui">
+                <button class="vr-button" id="startInterview" onclick="startInterview()">Start Interview</button>
+                <button class="vr-button" id="nextQuestion" onclick="nextQuestion()" disabled>Next Question</button>
+                <button class="vr-button" id="pauseInterview" onclick="pauseInterview()" disabled>Pause</button>
+                <button class="vr-button" id="endInterview" onclick="endInterview()" disabled>End Interview</button>
+                <button class="vr-button" id="viewFeedback" onclick="showFeedback()" disabled>View Feedback</button>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="interview-panel">
+            <!-- AI Status Panel -->
+            <div class="panel-section">
+                <div class="panel-title">🤖 AI Intelligence</div>
+                <div class="setup-item">
+                    <div class="setup-label">AI Question Generation</div>
+                    <div style="color: #27ae60; font-weight: bold;">✅ Automatically Enabled</div>
+                    <div style="color: white; font-size: 0.9rem; margin-top: 0.5rem;">
+                        Smart questions generated based on your job position and experience level
+                    </div>
+                </div>
+                <div class="setup-item">
+                    <div class="setup-label">AI Features Active</div>
+                    <div style="color: #3498db; font-size: 0.9rem;">
+                        • Personalized question generation<br>
+                        • Context-aware scenarios<br>
+                        • Industry trend integration<br>
+                        • Difficulty-based adaptation
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interview Setup -->
+            <div class="panel-section">
+                <div class="panel-title">⚙️ Interview Setup</div>
+                <div class="interview-setup">
+                    <div class="setup-item">
+                        <div class="setup-label">Job Position</div>
+                        <select class="setup-select" id="jobPosition">
+                            <option value="software-engineer">Software Engineer</option>
+                            <option value="data-scientist">Data Scientist</option>
+                            <option value="product-manager">Product Manager</option>
+                            <option value="marketing-specialist">Marketing Specialist</option>
+                            <option value="sales-representative">Sales Representative</option>
+                            <option value="business-analyst">Business Analyst</option>
+                            <option value="ui-ux-designer">UI/UX Designer</option>
+                            <option value="project-manager">Project Manager</option>
+                            <option value="customer-service">Customer Service</option>
+                            <option value="finance-analyst">Finance Analyst</option>
+                        </select>
+                    </div>
+                    <div class="setup-item">
+                        <div class="setup-label">Interview Type</div>
+                        <select class="setup-select" id="interviewType">
+                            <option value="behavioral">Behavioral Interview</option>
+                            <option value="technical">Technical Interview</option>
+                            <option value="case-study">Case Study</option>
+                            <option value="presentation">Presentation Round</option>
+                            <option value="group-discussion">Group Discussion</option>
+                            <option value="stress-interview">Stress Interview</option>
+                        </select>
+                    </div>
+                    <div class="setup-item">
+                        <div class="setup-label">Difficulty Level</div>
+                        <select class="setup-select" id="difficultyLevel">
+                            <option value="beginner">Beginner (0-2 years)</option>
+                            <option value="intermediate">Intermediate (2-5 years)</option>
+                            <option value="experienced">Experienced (5+ years)</option>
+                            <option value="senior">Senior Level (10+ years)</option>
+                        </select>
+                    </div>
+                    <div class="setup-item">
+                        <div class="setup-label">Interview Duration</div>
+                        <select class="setup-select" id="interviewDuration">
+                            <option value="15">15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">60 minutes</option>
+                        </select>
+                    </div>
+                    <div class="setup-item">
+                        <div class="setup-label">Candidate Name</div>
+                        <input type="text" class="setup-input" id="candidateName" placeholder="Enter your name">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Question -->
+            <div class="panel-section">
+                <div class="panel-title">❓ Current Question</div>
+                <div class="question-display">
+                    <div class="question-text" id="currentQuestion">
+                        Welcome! Click "Start Interview" to begin your practice session.
+                    </div>
+                    <div class="question-timer">
+                        <span>Time Remaining:</span>
+                        <div class="timer-circle" id="questionTimer">--</div>
+                    </div>
+                </div>
+                <div class="video-controls">
+                    <button class="video-btn" onclick="recordAnswer()">🎤 Record Answer</button>
+                    <button class="video-btn" onclick="playbackAnswer()">▶️ Playback</button>
+                    <button class="video-btn" onclick="skipQuestion()">⏭️ Skip</button>
+                    <button class="video-btn" onclick="interviewPanel.viewAllAnswers()">📹 All Videos</button>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="panel-section">
+                <div class="panel-title">📊 Performance Metrics</div>
+                <div class="metric-item">
+                    <span class="metric-label">Confidence Level</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="confidenceBar" style="width: 0%"></div>
+                    </div>
+                    <span class="metric-value" id="confidenceValue">0%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Speech Clarity</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="clarityBar" style="width: 0%"></div>
+                    </div>
+                    <span class="metric-value" id="clarityValue">0%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Response Time</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="responseBar" style="width: 0%"></div>
+                    </div>
+                    <span class="metric-value" id="responseValue">0s</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Eye Contact</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="eyeContactBar" style="width: 0%"></div>
+                    </div>
+                    <span class="metric-value" id="eyeContactValue">0%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Overall Score</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="overallBar" style="width: 0%"></div>
+                    </div>
+                    <span class="metric-value" id="overallValue">0%</span>
+                </div>
+            </div>
+
+            <!-- Interview Status -->
+            <div class="panel-section">
+                <div class="panel-title">📋 Interview Status</div>
+                <div class="metric-item">
+                    <span class="metric-label">
+                        <span class="status-indicator status-waiting" id="statusIndicator"></span>
+                        Status
+                    </span>
+                    <span class="metric-value" id="interviewStatus">Ready to Start</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Questions Completed</span>
+                    <span class="metric-value" id="questionsCompleted">0/10</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Elapsed</span>
+                    <span class="metric-value" id="timeElapsed">00:00</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Recording Quality</span>
+                    <span class="metric-value" id="recordingQuality">HD Ready</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Total Videos</span>
+                    <span class="metric-value" id="totalVideos">0</span>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="panel-section">
+                <div class="panel-title">💡 Interview Tips</div>
+                <div style="color: white; font-size: 0.9rem; line-height: 1.5;">
+                    <strong>Key Points:</strong><br>
+                    • Maintain eye contact with interviewers<br>
+                    • Speak clearly and at moderate pace<br>
+                    • Use STAR method for behavioral questions<br>
+                    • Ask thoughtful questions at the end<br>
+                    • Show enthusiasm and confidence<br>
+                    • Practice good posture and body language
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Panel -->
+    <div class="feedback-panel" id="feedbackPanel">
+        <div class="feedback-header">
+            <div class="feedback-title">📈 Interview Feedback & Analysis</div>
+            <button class="close-btn" onclick="closeFeedback()">×</button>
+        </div>
+        <div class="score-display">
+            <div class="score-item">
+                <div class="score-number" id="finalScore">85</div>
+                <div class="score-label">Overall Score</div>
+            </div>
+            <div class="score-item">
+                <div class="score-number" id="completionRate">100</div>
+                <div class="score-label">Completion %</div>
+            </div>
+            <div class="score-item">
+                <div class="score-number" id="confidenceLevel">78</div>
+                <div class="score-label">Confidence</div>
+            </div>
+        </div>
+        <div class="feedback-section">
+            <h3>Strengths</h3>
+            <div id="strengthsList">
+                • Excellent communication skills<br>
+                • Good technical knowledge<br>
+                • Professional demeanor
+            </div>
+        </div>
+        <div class="feedback-section">
+            <h3>Areas for Improvement</h3>
+            <div id="improvementsList">
+                • Work on maintaining eye contact<br>
+                • Reduce use of filler words<br>
+                • Provide more specific examples
+            </div>
+        </div>
+        <div class="feedback-section">
+            <h3>Recommended Actions</h3>
+            <div id="recommendationsList">
+                • Practice STAR method responses<br>
+                • Record yourself answering questions<br>
+                • Research company-specific questions
+            </div>
+        </div>
+        <div class="video-controls">
+            <button class="video-btn" onclick="downloadReport()">📄 Download Report</button>
+            <button class="video-btn" onclick="scheduleFollowUp()">📅 Schedule Follow-up</button>
+            <button class="video-btn" onclick="retakeInterview()">🔄 Retake Interview</button>
+        </div>
+    </div>
+
+    <script src="interview-panel.js"></script>
+</body>
+</html>

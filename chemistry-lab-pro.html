@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional VR Chemistry Lab</title>
+    
+    <!-- A-Frame for VR -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- Physics Engine -->
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+    <!-- Interaction Controls -->
+    <script src="https://cdn.jsdelivr.net/gh/supermedium/super-hands@3.0.3/dist/super-hands.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Professional Lab Interface */
+        .lab-interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Equipment Panel */
+        .equipment-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            pointer-events: all;
+            z-index: 100;
+        }
+
+        .panel-title {
+            color: #00ff88;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 10px;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .equipment-item {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .equipment-item:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .equipment-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .equipment-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: black;
+        }
+
+        .equipment-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Instructions Panel */
+        .instructions-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            max-height: 70vh;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff6b35;
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            pointer-events: all;
+            overflow-y: auto;
+        }
+
+        .experiment-selector {
+            margin-bottom: 20px;
+        }
+
+        .experiment-selector select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ff6b35;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 4px solid #ff6b35;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active {
+            background: rgba(255, 107, 53, 0.3);
+            transform: translateX(5px);
+        }
+
+        .step-item.completed {
+            background: rgba(0, 255, 136, 0.2);
+            border-left-color: #00ff88;
+        }
+
+        /* Temperature Display */
+        .temp-display {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 15px;
+            pointer-events: all;
+            min-width: 200px;
+        }
+
+        .temp-value {
+            font-size: 1.5rem;
+            color: #00ff88;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px 30px;
+            pointer-events: all;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 255, 136, 0.3);
+            border-left: 4px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* VR Scene Container */
+        .vr-scene {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .equipment-panel, .instructions-panel {
+                width: 280px;
+                font-size: 0.9rem;
+            }
+            
+            .equipment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <h2>Initializing Professional Chemistry Lab...</h2>
+        <p>Loading realistic equipment and physics...</p>
+    </div>
+
+    <!-- Lab Interface -->
+    <div class="lab-interface">
+        <!-- Equipment Panel -->
+        <div class="equipment-panel">
+            <div class="panel-title">🧪 Laboratory Equipment</div>
+            <div class="equipment-grid">
+                <div class="equipment-item" data-equipment="beaker">
+                    <div class="equipment-icon">🥤</div>
+                    <div class="equipment-name">Beaker</div>
+                </div>
+                <div class="equipment-item" data-equipment="test-tube">
+                    <div class="equipment-icon">🧪</div>
+                    <div class="equipment-name">Test Tube</div>
+                </div>
+                <div class="equipment-item" data-equipment="flask">
+                    <div class="equipment-icon">⚗️</div>
+                    <div class="equipment-name">Flask</div>
+                </div>
+                <div class="equipment-item" data-equipment="stirring-rod">
+                    <div class="equipment-icon">🥄</div>
+                    <div class="equipment-name">Stirring Rod</div>
+                </div>
+                <div class="equipment-item" data-equipment="thermometer">
+                    <div class="equipment-icon">🌡️</div>
+                    <div class="equipment-name">Thermometer</div>
+                </div>
+                <div class="equipment-item" data-equipment="tripod">
+                    <div class="equipment-icon">🔺</div>
+                    <div class="equipment-name">Tripod Stand</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Panel -->
+        <div class="instructions-panel">
+            <div class="panel-title">📋 Experiment Instructions</div>
+            
+            <div class="experiment-selector">
+                <select id="experimentSelect">
+                    <option value="crystallization">Crystallization of Copper Sulphate</option>
+                    <option value="neutralization">Acid-Base Neutralization</option>
+                    <option value="precipitation">Precipitation Reaction</option>
+                    <option value="combustion">Combustion Analysis</option>
+                    <option value="electrolysis">Electrolysis of Water</option>
+                    <option value="titration">Acid-Base Titration</option>
+                    <option value="distillation">Simple Distillation</option>
+                </select>
+            </div>
+
+            <ul class="step-list" id="stepList">
+                <li class="step-item active">1. Place beaker on lab table</li>
+                <li class="step-item">2. Position tripod stand over Bunsen burner</li>
+                <li class="step-item">3. Add copper sulphate solution to beaker</li>
+                <li class="step-item">4. Light Bunsen burner</li>
+                <li class="step-item">5. Heat solution gently while stirring</li>
+                <li class="step-item">6. Monitor temperature with thermometer</li>
+                <li class="step-item">7. Observe crystal formation</li>
+            </ul>
+        </div>
+
+        <!-- Temperature Display -->
+        <div class="temp-display">
+            <div>Temperature</div>
+            <div class="temp-value" id="tempValue">25°C</div>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification">
+            <div id="notificationText">Welcome to the Professional Chemistry Lab!</div>
+        </div>
+    </div>
+
+    <!-- VR Scene -->
+    <div class="vr-scene">
+        <a-scene 
+            id="vrScene"
+            embedded 
+            style="height: 100%; width: 100%;"
+            vr-mode-ui="enabled: true"
+            device-orientation-permission-ui="enabled: true"
+            background="color: #f5f5f5"
+            fog="type: linear; color: #f5f5f5; near: 10; far: 100"
+            physics="driver: cannon; gravity: -9.8"
+            super-hands>
+            
+            <!-- Assets -->
+            <a-assets>
+                <!-- Realistic Materials -->
+                <a-mixin id="glass" material="color: #ffffff; opacity: 0.3; transparent: true; metalness: 0.1; roughness: 0.1; refractivity: 0.9"></a-mixin>
+                <a-mixin id="metal" material="color: #888888; metalness: 0.8; roughness: 0.2"></a-mixin>
+                <a-mixin id="wood" material="color: #8B4513; roughness: 0.8"></a-mixin>
+                <a-mixin id="flame" material="color: #FF4500; opacity: 0.8; transparent: true; shader: flat"></a-mixin>
+                <a-mixin id="solution" material="color: #1E90FF; opacity: 0.7; transparent: true; metalness: 0.1"></a-mixin>
+            </a-assets>
+
+            <!-- Enhanced Lighting for Professional Look -->
+            <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
+            <a-light type="directional" position="5 10 5" target="#lab-table" color="#ffffff" intensity="1.0" 
+                     light="castShadow: true; shadowMapHeight: 2048; shadowMapWidth: 2048"></a-light>
+            <a-light type="point" position="0 3 0" color="#ffffff" intensity="0.5"></a-light>
+            <a-light type="spot" position="2 4 -2" target="#lab-table" color="#ffffcc" intensity="0.8"></a-light>
+
+            <!-- Professional Lab Environment -->
+            <!-- Lab Floor with realistic tiles -->
+            <a-plane 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="20" 
+                height="20" 
+                color="#e8e8e8" 
+                material="roughness: 0.9; metalness: 0.1"
+                physics="type: static; mass: 0"
+                shadow="receive: true">
+            </a-plane>
+
+            <!-- Lab Walls -->
+            <a-plane position="0 5 -10" width="20" height="10" 
+                     color="#f0f0f0" 
+                     material="roughness: 0.7"
+                     physics="type: static"
+                     shadow="receive: true"></a-plane>
+            <a-plane position="-10 5 0" rotation="0 90 0" width="20" height="10" 
+                     color="#f0f0f0" 
+                     material="roughness: 0.7"
+                     physics="type: static"></a-plane>
+            <a-plane position="10 5 0" rotation="0 -90 0" width="20" height="10" 
+                     color="#f0f0f0" 
+                     material="roughness: 0.7"
+                     physics="type: static"></a-plane>
+
+            <!-- Professional Lab Table -->
+            <a-entity id="lab-table-entity" position="0 1 -3">
+                <!-- Table Top -->
+                <a-box 
+                    id="lab-table"
+                    width="6" 
+                    height="0.1" 
+                    depth="3" 
+                    color="#2c2c2c"
+                    material="roughness: 0.3; metalness: 0.7"
+                    physics="type: static; mass: 0"
+                    class="drop-zone"
+                    shadow="cast: true; receive: true">
+                </a-box>
+                <!-- Table Legs -->
+                <a-cylinder position="-2.8 -0.5 -1.3" radius="0.05" height="1" color="#888888" material="metalness: 0.8"></a-cylinder>
+                <a-cylinder position="2.8 -0.5 -1.3" radius="0.05" height="1" color="#888888" material="metalness: 0.8"></a-cylinder>
+                <a-cylinder position="-2.8 -0.5 1.3" radius="0.05" height="1" color="#888888" material="metalness: 0.8"></a-cylinder>
+                <a-cylinder position="2.8 -0.5 1.3" radius="0.05" height="1" color="#888888" material="metalness: 0.8"></a-cylinder>
+            </a-entity>
+
+            <!-- REALISTIC BUNSEN BURNER -->
+            <a-entity id="bunsen-burner-entity" position="1 1.1 -3">
+                <!-- Burner Base -->
+                <a-cylinder 
+                    id="burner-base"
+                    radius="0.15" 
+                    height="0.05" 
+                    color="#444444"
+                    material="metalness: 0.9; roughness: 0.1"
+                    physics="type: static"
+                    shadow="cast: true">
+                </a-cylinder>
+                <!-- Burner Column -->
+                <a-cylinder 
+                    id="bunsen-burner"
+                    position="0 0.15 0"
+                    radius="0.04" 
+                    height="0.3" 
+                    color="#333333"
+                    material="metalness: 0.8; roughness: 0.2"
+                    physics="type: static; mass: 0"
+                    class="drop-zone heating-zone clickable"
+                    shadow="cast: true">
+                </a-cylinder>
+                <!-- Air Hole Control -->
+                <a-box position="0 0.05 0.05" width="0.1" height="0.02" depth="0.02" color="#666666" material="metalness: 0.7"></a-box>
+                <!-- Gas Control Valve -->
+                <a-cylinder position="0.1 0.05 0" radius="0.015" height="0.05" rotation="0 0 90" color="#555555" material="metalness: 0.8"></a-cylinder>
+                <!-- Gas Pipe -->
+                <a-cylinder 
+                    position="0 -0.1 0.2" 
+                    radius="0.01" 
+                    height="0.4" 
+                    color="#666666"
+                    rotation="90 0 0"
+                    material="metalness: 0.7">
+                </a-cylinder>
+                
+                <!-- REALISTIC FLAME EFFECTS -->
+                <a-entity id="flame-group" visible="false">
+                    <!-- Outer Flame -->
+                    <a-cone 
+                        id="flame-outer"
+                        position="0 0.35 0" 
+                        radius-bottom="0.08" 
+                        radius-top="0.02" 
+                        height="0.25" 
+                        color="#FF6B35" 
+                        material="opacity: 0.7; transparent: true; shader: flat"
+                        animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+                    </a-cone>
+                    <!-- Inner Blue Flame -->
+                    <a-cone 
+                        id="flame-inner"
+                        position="0 0.32 0" 
+                        radius-bottom="0.04" 
+                        radius-top="0.01" 
+                        height="0.15" 
+                        color="#0066FF" 
+                        material="opacity: 0.8; transparent: true; shader: flat"
+                        animation="property: rotation; to: 0 -360 0; loop: true; dur: 1500">
+                    </a-cone>
+                    <!-- Heat Shimmer Effect -->
+                    <a-cylinder 
+                        position="0 0.5 0" 
+                        radius="0.1" 
+                        height="0.3" 
+                        color="#ffffff" 
+                        material="opacity: 0.1; transparent: true"
+                        animation="property: scale; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 800">
+                    </a-cylinder>
+                </a-entity>
+            </a-entity>
+
+            <!-- TRIPOD STAND -->
+            <a-entity id="tripod-stand" position="1 1.1 -2.5" visible="true">
+                <!-- Three Legs -->
+                <a-cylinder position="0.1 0.15 0.1" radius="0.008" height="0.3" color="#888888" rotation="15 0 15" material="metalness: 0.8"></a-cylinder>
+                <a-cylinder position="-0.1 0.15 0.1" radius="0.008" height="0.3" color="#888888" rotation="15 0 -15" material="metalness: 0.8"></a-cylinder>
+                <a-cylinder position="0 0.15 -0.12" radius="0.008" height="0.3" color="#888888" rotation="-15 0 0" material="metalness: 0.8"></a-cylinder>
+                <!-- Wire Gauze -->
+                <a-circle 
+                    id="wire-gauze"
+                    position="0 0.3 0" 
+                    radius="0.12" 
+                    color="#999999" 
+                    material="wireframe: true; opacity: 0.8; transparent: true"
+                    rotation="-90 0 0"
+                    physics="type: static"
+                    class="drop-zone equipment-zone">
+                </a-circle>
+            </a-entity>
+
+            <!-- REALISTIC GLASS BEAKER -->
+            <a-entity id="beaker-spawn" position="-3 1.3 -2">
+                <a-cylinder 
+                    id="beaker"
+                    radius="0.15" 
+                    height="0.25" 
+                    mixin="glass"
+                    physics="type: dynamic; mass: 0.3; shape: cylinder"
+                    grabbable
+                    hoverable
+                    class="draggable equipment beaker-equipment"
+                    shadow="cast: true">
+                </a-cylinder>
+                <!-- Beaker Spout -->
+                <a-box position="0.16 0.1 0" width="0.03" height="0.05" depth="0.02" 
+                       mixin="glass"></a-box>
+                <!-- Volume Markings -->
+                <a-text position="0 0.05 0.16" value="250ml" align="center" color="#000" scale="0.15 0.15 0.15"></a-text>
+                <a-text position="0 -0.05 0.16" value="100ml" align="center" color="#000" scale="0.15 0.15 0.15"></a-text>
+                
+                <!-- Copper Sulphate Solution -->
+                <a-cylinder 
+                    id="solution"
+                    position="0 -0.05 0" 
+                    radius="0.13" 
+                    height="0.15" 
+                    mixin="solution"
+                    visible="true">
+                </a-cylinder>
+            </a-entity>
+
+            <!-- REALISTIC STIRRING ROD -->
+            <a-entity id="stirring-rod-spawn" position="-2.5 1.2 -1.5">
+                <a-cylinder 
+                    id="stirring-rod"
+                    radius="0.008" 
+                    height="0.4" 
+                    color="#C0C0C0"
+                    material="metalness: 0.9; roughness: 0.1"
+                    rotation="0 0 90"
+                    physics="type: dynamic; mass: 0.05; shape: cylinder"
+                    grabbable
+                    hoverable
+                    class="draggable equipment stirring-rod-equipment"
+                    shadow="cast: true">
+                </a-cylinder>
+                <!-- Handle -->
+                <a-sphere position="0.18 0 0" radius="0.015" color="#FF0000" material="roughness: 0.8"></a-sphere>
+            </a-entity>
+
+            <!-- TEST TUBE -->
+            <a-entity id="test-tube-spawn" position="-2 1.2 -1.5">
+                <a-cylinder 
+                    id="test-tube"
+                    radius="0.02" 
+                    height="0.15" 
+                    mixin="glass"
+                    physics="type: dynamic; mass: 0.05"
+                    grabbable
+                    hoverable
+                    class="draggable equipment"
+                    shadow="cast: true">
+                </a-cylinder>
+                <!-- Rounded Bottom -->
+                <a-sphere position="0 -0.065 0" radius="0.02" mixin="glass"></a-sphere>
+            </a-entity>
+
+            <!-- CONICAL FLASK -->
+            <a-entity id="flask-spawn" position="-1.5 1.2 -1.5">
+                <!-- Flask Body -->
+                <a-cone 
+                    id="flask"
+                    radius-bottom="0.12" 
+                    radius-top="0.04" 
+                    height="0.15" 
+                    mixin="glass"
+                    physics="type: dynamic; mass: 0.2"
+                    grabbable
+                    hoverable
+                    class="draggable equipment"
+                    shadow="cast: true">
+                </a-cone>
+                <!-- Flask Neck -->
+                <a-cylinder position="0 0.12 0" radius="0.02" height="0.08" mixin="glass"></a-cylinder>
+            </a-entity>
+
+            <!-- DIGITAL THERMOMETER -->
+            <a-entity id="thermometer-spawn" position="2 1.3 -3.5">
+                <!-- Thermometer Body -->
+                <a-box 
+                    id="thermometer"
+                    width="0.04" 
+                    height="0.25" 
+                    depth="0.02" 
+                    color="#ffffff"
+                    material="roughness: 0.2"
+                    physics="type: dynamic; mass: 0.1"
+                    grabbable
+                    hoverable
+                    class="draggable equipment thermometer-equipment"
+                    shadow="cast: true">
+                </a-box>
+                <!-- Digital Display -->
+                <a-box position="0 0.08 0.015" width="0.035" height="0.06" depth="0.005" color="#000000"></a-box>
+                <a-text position="0 0.08 0.02" value="25°C" align="center" color="#00ff00" scale="0.15 0.15 0.15" id="temp-display-3d"></a-text>
+                <!-- Temperature Probe -->
+                <a-cylinder position="0 -0.15 0" radius="0.003" height="0.05" color="#silver" material="metalness: 0.9"></a-cylinder>
+            </a-entity>
+
+            <!-- CRYSTAL FORMATION AREA -->
+            <a-entity id="crystal-formation" position="0 1.15 -2">
+                <!-- Crystallization Dish -->
+                <a-cylinder 
+                    id="crystal-dish"
+                    radius="0.2" 
+                    height="0.03" 
+                    mixin="glass"
+                    physics="type: static"
+                    class="drop-zone crystallization-zone"
+                    shadow="receive: true">
+                </a-cylinder>
+                
+                <!-- Dynamic Crystal Formation -->
+                <a-entity id="crystals-container" position="0 0.02 0">
+                    <a-box 
+                        id="crystal-1"
+                        position="0.05 0 0.05" 
+                        width="0.015" 
+                        height="0.025" 
+                        depth="0.015" 
+                        color="#4169E1" 
+                        visible="false"
+                        material="metalness: 0.8; roughness: 0.1; transparent: true; opacity: 0.9"
+                        animation__grow="property: scale; from: 0 0 0; to: 2 2 2; dur: 3000; easing: easeOutBack">
+                    </a-box>
+                    <a-box 
+                        id="crystal-2"
+                        position="-0.05 0 -0.05" 
+                        width="0.02" 
+                        height="0.02" 
+                        depth="0.02" 
+                        color="#4169E1" 
+                        visible="false"
+                        material="metalness: 0.8; roughness: 0.1; transparent: true; opacity: 0.9"
+                        animation__grow="property: scale; from: 0 0 0; to: 1.8 1.8 1.8; dur: 3000; easing: easeOutBack">
+                    </a-box>
+                    <a-octahedron 
+                        id="crystal-3"
+                        position="0 0 -0.08" 
+                        radius="0.015" 
+                        color="#4169E1" 
+                        visible="false"
+                        material="metalness: 0.9; roughness: 0.05; transparent: true; opacity: 0.95"
+                        animation__grow="property: scale; from: 0 0 0; to: 2.2 2.2 2.2; dur: 3000; easing: easeOutBack">
+                    </a-octahedron>
+                </a-entity>
+            </a-entity>
+
+            <!-- VR CAMERA WITH ENHANCED INTERACTION -->
+            <a-camera 
+                id="rig"
+                position="0 1.7 2" 
+                look-controls="enabled: true; pointerLockEnabled: false" 
+                wasd-controls="enabled: true; acceleration: 20"
+                cursor="rayOrigin: mouse; fuse: false"
+                raycaster="objects: .draggable, .drop-zone, .equipment, .clickable"
+                super-hands="colliderEvent: raycaster-intersection;
+                            colliderEventProperty: els;
+                            colliderEndEvent: raycaster-intersection-cleared;
+                            colliderEndEventProperty: clearedEls">
+                
+                <!-- VR Hand Controllers -->
+                <a-entity id="leftHand" 
+                          hand-controls="hand: left; handModelStyle: lowPoly; color: #ffcccc"
+                          super-hands="colliderEvent: raycaster-intersection; colliderEventProperty: els; colliderEndEvent: raycaster-intersection-cleared; colliderEndEventProperty: clearedEls"></a-entity>
+                <a-entity id="rightHand" 
+                          hand-controls="hand: right; handModelStyle: lowPoly; color: #ffcccc"
+                          super-hands="colliderEvent: raycaster-intersection; colliderEventProperty: els; colliderEndEvent: raycaster-intersection-cleared; colliderEndEventProperty: clearedEls"></a-entity>
+            </a-camera>
+
+            <!-- PARTICLE EFFECTS -->
+            <a-entity id="particle-effects">
+                <!-- Steam Particles -->
+                <a-entity id="steam-system" position="1 1.6 -3" visible="false">
+                    <a-sphere radius="0.005" color="#ffffff" material="opacity: 0.4; transparent: true"
+                              animation="property: position; from: 0 0 0; to: 0.1 0.3 0.1; dur: 2000; loop: true; easing: easeOutQuad"></a-sphere>
+                    <a-sphere radius="0.007" color="#ffffff" material="opacity: 0.3; transparent: true"
+                              animation="property: position; from: 0.05 0 -0.05; to: -0.05 0.4 0.05; dur: 2500; loop: true; easing: easeOutQuad; delay: 500"></a-sphere>
+                    <a-sphere radius="0.006" color="#ffffff" material="opacity: 0.35; transparent: true"
+                              animation="property: position; from: -0.03 0 0.03; to: 0.08 0.35 -0.08; dur: 2200; loop: true; easing: easeOutQuad; delay: 1000"></a-sphere>
+                </a-entity>
+                
+                <!-- Bubble Effects for Stirring -->
+                <a-entity id="bubble-system" position="0 1.2 -2" visible="false">
+                    <!-- Multiple small bubbles -->
+                    <a-sphere radius="0.003" color="#ffffff" material="opacity: 0.6; transparent: true"
+                              animation="property: position; from: 0 0 0; to: 0.02 0.1 0.02; dur: 1000; loop: true; easing: easeOutQuad"></a-sphere>
+                    <a-sphere radius="0.004" color="#ffffff" material="opacity: 0.5; transparent: true"
+                              animation="property: position; from: 0.01 0 -0.01; to: -0.01 0.08 0.01; dur: 1200; loop: true; easing: easeOutQuad; delay: 300"></a-sphere>
+                </a-entity>
+            </a-entity>
+
+            <!-- ENHANCED ENVIRONMENT -->
+            <a-sky color="#e6f3ff"></a-sky>
+        </a-scene>
+    </div>
+
+    <script>
+        class ProfessionalChemistryLab {
+            constructor() {
+                this.currentExperiment = 'crystallization';
+                this.currentStep = 0;
+                this.temperature = 25;
+                this.isHeating = false;
+                this.isStirring = false;
+                this.crystalsFormed = false;
+                
+                this.experiments = {
+                    crystallization: {
+                        name: "Crystallization of Copper Sulphate",
+                        steps: [
+                            "Place beaker on tripod stand",
+                            "Position tripod over Bunsen burner",
+                            "Add copper sulphate solution to beaker",
+                            "Light Bunsen burner",
+                            "Heat solution gently while stirring",
+                            "Monitor temperature with thermometer",
+                            "Observe crystal formation",
+                            "Cool and collect crystals"
+                        ]
+                    },
+                    neutralization: {
+                        name: "Acid-Base Neutralization",
+                        steps: [
+                            "Add HCl solution to beaker",
+                            "Add universal indicator",
+                            "Note the red color (acidic)",
+                            "Slowly add NaOH using stirring rod",
+                            "Stir continuously",
+                            "Observe color change to green (neutral)",
+                            "Record pH value",
+                            "Heat to evaporate water"
+                        ]
+                    },
+                    precipitation: {
+                        name: "Precipitation Reaction",
+                        steps: [
+                            "Add AgNO₃ solution to test tube",
+                            "Add NaCl solution dropwise",
+                            "Observe white precipitate formation",
+                            "Filter the precipitate",
+                            "Wash with distilled water",
+                            "Dry the precipitate",
+                            "Weigh the final product"
+                        ]
+                    }
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.hideLoadingScreen();
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+                this.startTemperatureMonitoring();
+                this.showNotification("Welcome to the Professional Chemistry Lab!");
+            }
+            
+            hideLoadingScreen() {
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if (loadingScreen) {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 500);
+                    }
+                }, 2000);
+            }
+            
+            setupEventListeners() {
+                // Experiment selector
+                document.getElementById('experimentSelect').addEventListener('change', (e) => {
+                    this.switchExperiment(e.target.value);
+                });
+                
+                // Equipment panel interactions
+                document.querySelectorAll('.equipment-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        this.spawnEquipment(item.dataset.equipment);
+                    });
+                });
+                
+                // VR Scene interactions
+                document.addEventListener('DOMContentLoaded', () => {
+                    const scene = document.querySelector('a-scene');
+                    if (scene.hasLoaded) {
+                        this.setupVRInteractions();
+                    } else {
+                        scene.addEventListener('loaded', () => {
+                            this.setupVRInteractions();
+                        });
+                    }
+                });
+                
+                // Bunsen burner click
+                setTimeout(() => {
+                    const bunsenBurner = document.querySelector('#bunsen-burner');
+                    if (bunsenBurner) {
+                        bunsenBurner.addEventListener('click', () => {
+                            this.toggleBunsenBurner();
+                        });
+                    }
+                }, 3000);
+            }
+            
+            setupDragAndDrop() {
+                // Enhanced drag and drop for equipment
+                setTimeout(() => {
+                    document.querySelectorAll('.draggable').forEach(element => {
+                        // Add drag start event
+                        element.addEventListener('dragstart', (e) => {
+                            this.onDragStart(e, element);
+                        });
+                        
+                        // Add grab event for VR
+                        element.addEventListener('grab-start', (e) => {
+                            this.onGrabStart(e, element);
+                        });
+                        
+                        // Add drop event
+                        element.addEventListener('dragend', (e) => {
+                            this.onDragEnd(e, element);
+                        });
+                    });
+                    
+                    // Setup drop zones
+                    document.querySelectorAll('.drop-zone').forEach(zone => {
+                        zone.addEventListener('dragenter', (e) => {
+                            this.onDragEnter(e, zone);
+                        });
+                        
+                        zone.addEventListener('dragleave', (e) => {
+                            this.onDragLeave(e, zone);
+                        });
+                        
+                        zone.addEventListener('drop', (e) => {
+                            this.onDrop(e, zone);
+                        });
+                    });
+                }, 3000);
+            }
+            
+            setupVRInteractions() {
+                // Enhanced VR interaction setup
+                const beaker = document.querySelector('#beaker');
+                const stirringRod = document.querySelector('#stirring-rod');
+                const thermometer = document.querySelector('#thermometer');
+                
+                if (beaker) {
+                    beaker.addEventListener('collisions', (e) => {
+                        this.handleBeakerCollision(e);
+                    });
+                }
+                
+                if (stirringRod) {
+                    stirringRod.addEventListener('grab-start', () => {
+                        this.startStirring();
+                    });
+                    
+                    stirringRod.addEventListener('grab-end', () => {
+                        this.stopStirring();
+                    });
+                }
+                
+                if (thermometer) {
+                    thermometer.addEventListener('collisions', (e) => {
+                        this.handleThermometerReading(e);
+                    });
+                }
+            }
+            
+            spawnEquipment(equipmentType) {
+                const spawnPositions = {
+                    beaker: { x: -3, y: 1.3, z: -2 },
+                    'test-tube': { x: -2, y: 1.2, z: -1.5 },
+                    flask: { x: -1.5, y: 1.2, z: -1.5 },
+                    'stirring-rod': { x: -2.5, y: 1.2, z: -1.5 },
+                    thermometer: { x: 2, y: 1.3, z: -3.5 },
+                    tripod: { x: 1, y: 1.1, z: -2.5 }
+                };
+                
+                const position = spawnPositions[equipmentType];
+                if (!position) return;
+                
+                // Show existing equipment or create new instance
+                const existingElement = document.querySelector(`#${equipmentType}-spawn`);
+                if (existingElement) {
+                    existingElement.setAttribute('visible', 'true');
+                    existingElement.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
+                }
+                
+                this.showNotification(`${equipmentType.replace('-', ' ')} is now available on the lab table`);
+            }
+            
+            toggleBunsenBurner() {
+                const flameGroup = document.querySelector('#flame-group');
+                const steamSystem = document.querySelector('#steam-system');
+                
+                if (flameGroup && steamSystem) {
+                    const isLit = flameGroup.getAttribute('visible');
+                    
+                    if (isLit === 'false' || !isLit) {
+                        // Light the burner
+                        flameGroup.setAttribute('visible', 'true');
+                        this.isHeating = true;
+                        this.showNotification("Bunsen burner is now lit! 🔥");
+                        this.nextStep();
+                    } else {
+                        // Turn off the burner
+                        flameGroup.setAttribute('visible', 'false');
+                        steamSystem.setAttribute('visible', 'false');
+                        this.isHeating = false;
+                        this.showNotification("Bunsen burner turned off");
+                    }
+                }
+            }
+            
+            startStirring() {
+                this.isStirring = true;
+                const bubbleSystem = document.querySelector('#bubble-system');
+                const stirringRod = document.querySelector('#stirring-rod');
+                
+                if (bubbleSystem) {
+                    bubbleSystem.setAttribute('visible', 'true');
+                }
+                
+                if (stirringRod) {
+                    stirringRod.setAttribute('animation', 
+                        'property: rotation; to: 0 0 450; dur: 2000; loop: true; easing: linear');
+                }
+                
+                this.showNotification("Stirring the solution... 🌀");
+                this.nextStep();
+            }
+            
+            stopStirring() {
+                this.isStirring = false;
+                const bubbleSystem = document.querySelector('#bubble-system');
+                const stirringRod = document.querySelector('#stirring-rod');
+                
+                if (bubbleSystem) {
+                    bubbleSystem.setAttribute('visible', 'false');
+                }
+                
+                if (stirringRod) {
+                    stirringRod.removeAttribute('animation');
+                }
+            }
+            
+            startTemperatureMonitoring() {
+                setInterval(() => {
+                    if (this.isHeating) {
+                        this.temperature = Math.min(this.temperature + 2, 100);
+                        
+                        // Show steam when heating
+                        if (this.temperature > 60) {
+                            const steamSystem = document.querySelector('#steam-system');
+                            if (steamSystem) {
+                                steamSystem.setAttribute('visible', 'true');
+                            }
+                        }
+                        
+                        // Crystal formation at optimal temperature
+                        if (this.temperature > 80 && this.isStirring && !this.crystalsFormed) {
+                            this.formCrystals();
+                        }
+                    } else if (!this.isHeating && this.temperature > 25) {
+                        this.temperature = Math.max(this.temperature - 1, 25);
+                    }
+                    
+                    this.updateTemperatureDisplay();
+                }, 1000);
+            }
+            
+            updateTemperatureDisplay() {
+                const tempDisplay = document.getElementById('tempValue');
+                const tempDisplay3D = document.querySelector('#temp-display-3d');
+                
+                if (tempDisplay) {
+                    tempDisplay.textContent = `${this.temperature}°C`;
+                    
+                    // Change color based on temperature
+                    if (this.temperature > 80) {
+                        tempDisplay.style.color = '#ff4444';
+                    } else if (this.temperature > 50) {
+                        tempDisplay.style.color = '#ffaa00';
+                    } else {
+                        tempDisplay.style.color = '#00ff88';
+                    }
+                }
+                
+                if (tempDisplay3D) {
+                    tempDisplay3D.setAttribute('value', `${this.temperature}°C`);
+                }
+            }
+            
+            formCrystals() {
+                this.crystalsFormed = true;
+                const crystals = ['crystal-1', 'crystal-2', 'crystal-3'];
+                
+                crystals.forEach((crystalId, index) => {
+                    setTimeout(() => {
+                        const crystal = document.querySelector(`#${crystalId}`);
+                        if (crystal) {
+                            crystal.setAttribute('visible', 'true');
+                        }
+                    }, index * 1000);
+                });
+                
+                this.showNotification("Beautiful crystals are forming! ✨");
+                this.nextStep();
+            }
+            
+            switchExperiment(experimentType) {
+                this.currentExperiment = experimentType;
+                this.currentStep = 0;
+                this.updateStepList();
+                this.showNotification(`Starting: ${this.experiments[experimentType].name}`);
+            }
+            
+            updateStepList() {
+                const stepList = document.getElementById('stepList');
+                const experiment = this.experiments[this.currentExperiment];
+                
+                if (stepList && experiment) {
+                    stepList.innerHTML = '';
+                    experiment.steps.forEach((step, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'step-item';
+                        li.textContent = `${index + 1}. ${step}`;
+                        
+                        if (index === this.currentStep) {
+                            li.classList.add('active');
+                        } else if (index < this.currentStep) {
+                            li.classList.add('completed');
+                        }
+                        
+                        stepList.appendChild(li);
+                    });
+                }
+            }
+            
+            nextStep() {
+                const experiment = this.experiments[this.currentExperiment];
+                if (this.currentStep < experiment.steps.length - 1) {
+                    this.currentStep++;
+                    this.updateStepList();
+                }
+            }
+            
+            showNotification(message) {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notificationText');
+                
+                if (notification && notificationText) {
+                    notificationText.textContent = message;
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3000);
+                }
+            }
+            
+            // Enhanced collision and interaction handlers
+            onDragStart(e, element) {
+                element.classList.add('dragging');
+                this.showNotification(`Picked up ${element.id.replace('-', ' ')}`);
+            }
+            
+            onDragEnd(e, element) {
+                element.classList.remove('dragging');
+            }
+            
+            onDragEnter(e, zone) {
+                zone.classList.add('highlight');
+            }
+            
+            onDragLeave(e, zone) {
+                zone.classList.remove('highlight');
+            }
+            
+            onDrop(e, zone) {
+                zone.classList.remove('highlight');
+                
+                if (zone.id === 'wire-gauze' && e.target.classList.contains('beaker-equipment')) {
+                    this.showNotification("Beaker placed on tripod stand! 🧪");
+                    this.nextStep();
+                } else if (zone.classList.contains('heating-zone')) {
+                    this.showNotification("Equipment positioned over heat source! 🔥");
+                    this.nextStep();
+                }
+            }
+            
+            handleBeakerCollision(e) {
+                // Handle beaker interactions with other equipment
+                this.nextStep();
+            }
+            
+            handleThermometerReading(e) {
+                this.showNotification(`Temperature reading: ${this.temperature}°C 🌡️`);
+                this.nextStep();
+            }
+        }
+        
+        // Initialize the Professional Chemistry Lab
+        let chemLab;
+        document.addEventListener('DOMContentLoaded', () => {
+            chemLab = new ProfessionalChemistryLab();
+        });
+        
+        // Fallback initialization
+        setTimeout(() => {
+            if (!chemLab) {
+                chemLab = new ProfessionalChemistryLab();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -96,10 +96,10 @@
       }
 
       .login-title {
-        color: #00ff88;
+        color: white;
         font-size: 2.5rem;
         margin-bottom: 10px;
-        text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
       }
 
       .login-subtitle {
@@ -128,7 +128,7 @@
       }
 
       .tab-button.active {
-        background: #00ff88;
+        background: white;
         color: #000;
       }
 
@@ -150,16 +150,16 @@
       }
 
       .user-type-btn.active {
-        background: #00ff88;
+        background: white;
         color: #000;
-        border-color: #00ff88;
-        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        border-color: white;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
       }
 
       .user-type-btn:hover {
-        background: rgba(0, 255, 136, 0.2);
-        border-color: #00ff88;
-        color: #00ff88;
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        color: white;
       }
 
       .form-group {
@@ -188,8 +188,8 @@
 
       .form-input:focus {
         outline: none;
-        border-color: #00ff88;
-        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        border-color: white;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
       }
 
       .form-input::placeholder {
@@ -199,10 +199,10 @@
       .submit-btn {
         width: 100%;
         padding: 15px;
-        background: linear-gradient(45deg, #00ff88, #00cc6a);
-        border: none;
+        background: black;
+        border: 2px solid white;
         border-radius: 10px;
-        color: #000;
+        color: white;
         font-size: 1.1rem;
         font-weight: bold;
         cursor: pointer;
@@ -212,7 +212,9 @@
 
       .submit-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+        background: white;
+        color: black;
       }
 
       .close-btn {
@@ -238,9 +240,9 @@
       }
 
       .success-message {
-        background: rgba(0, 255, 136, 0.2);
-        border: 1px solid #00ff88;
-        color: #00ff88;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid white;
+        color: white;
         padding: 15px;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -265,10 +267,10 @@
       }
 
       .nav-auth-btn:hover {
-        background: rgba(0, 255, 136, 0.2);
-        border-color: #00ff88;
-        color: #00ff88;
-        box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        color: white;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         transform: translateY(-2px);
       }
 
@@ -277,18 +279,18 @@
         height: 30px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #00ff88;
-        box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        border: 2px solid white;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
       }
 
       .profile-btn {
-        background: rgba(0, 255, 136, 0.1) !important;
-        border-color: #00ff88 !important;
-        color: #00ff88 !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: white !important;
+        color: white !important;
       }
 
       .profile-btn:hover {
-        background: rgba(0, 255, 136, 0.3) !important;
+        background: rgba(255, 255, 255, 0.3) !important;
         transform: translateY(-2px) scale(1.05);
       }
 
@@ -306,7 +308,7 @@
         z-index: 10001;
         transform: translateX(400px);
         transition: all 0.5s ease;
-        border: 2px solid rgba(0, 255, 136, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
       }
 
       .ai-doubt-popup.show {
@@ -375,12 +377,13 @@
       }
 
       .popup-btn-primary {
-        background: #00ff88;
+        background: white;
         color: #000;
       }
 
       .popup-btn-primary:hover {
-        background: #00cc6a;
+        background: black;
+        color: white;
         transform: translateY(-2px);
       }
 
@@ -449,6 +452,8 @@
               <button class="dropbtn">Education</button>
               <div class="dropdown-content">
                 <a href="test.html">Attempt Test</a>
+                <a href="chemistry-lab.html">🧪 Chemistry Lab VR</a>
+                <a href="interview-panel.html">💼 Interview Training VR</a>
                 <a href="#" onclick="checkLoginAndRedirect()" id="portalLink">Portal</a>
                 <a href="contact.html">Contact Us</a>
               </div>
@@ -567,7 +572,7 @@
           <button type="submit" class="submit-btn">Login & Enter VR Class</button>
           
           <div class="form-footer">
-            <p>Don't have an account? <a href="#" onclick="switchTab('signup')" style="color: #00ff88;">Sign up here</a></p>
+            <p>Don't have an account? <a href="#" onclick="switchTab('signup')" style="color: white;">Sign up here</a></p>
           </div>
         </form>
         
@@ -662,7 +667,7 @@
           <button type="submit" class="submit-btn">Create Account & Enter VR</button>
           
           <div class="form-footer">
-            <p>Already have an account? <a href="#" onclick="switchTab('login')" style="color: #00ff88;">Login here</a></p>
+            <p>Already have an account? <a href="#" onclick="switchTab('login')" style="color: white;">Login here</a></p>
           </div>
         </form>
       </div>
@@ -675,35 +680,33 @@
         
         <div class="profile-header" style="margin-bottom: 30px;">
           <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 20px;">
-            <div id="profilePicDisplay" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #00ff88; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #00ff88;">👤</div>
-            <button onclick="document.getElementById('profilePicInput').click()" style="position: absolute; bottom: 0; right: 0; background: #00ff88; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1rem;">📷</button>
+            <div id="profilePicDisplay" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid white; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">👤</div>
+            <button onclick="document.getElementById('profilePicInput').click()" style="position: absolute; bottom: 0; right: 0; background: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1rem;">📷</button>
             <input type="file" id="profilePicInput" style="display: none;" accept="image/*" onchange="handleProfilePicUpload(event)">
           </div>
           <h2 class="login-title" id="profileDisplayName">Loading...</h2>
           <p class="login-subtitle" id="profileDisplayRole">VR Class Student</p>
         </div>
 
-        <div style="text-align: left; margin-bottom: 30px;">
+          <div style="text-align: left; margin-bottom: 30px;">
           <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
             <span style="color: rgba(255, 255, 255, 0.8);">Email:</span>
-            <span style="color: #00ff88;" id="profileDisplayEmail">Loading...</span>
+            <span style="color: white;" id="profileDisplayEmail">Loading...</span>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
             <span style="color: rgba(255, 255, 255, 0.8);">Age:</span>
-            <span style="color: #00ff88;" id="profileDisplayAge">Loading...</span>
+            <span style="color: white;" id="profileDisplayAge">Loading...</span>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
             <span style="color: rgba(255, 255, 255, 0.8);">Grade:</span>
-            <span style="color: #00ff88;" id="profileDisplayGrade">Loading...</span>
+            <span style="color: white;" id="profileDisplayGrade">Loading...</span>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 10px 0;">
             <span style="color: rgba(255, 255, 255, 0.8);">Member Since:</span>
-            <span style="color: #00ff88;" id="profileDisplayJoined">Loading...</span>
+            <span style="color: white;" id="profileDisplayJoined">Loading...</span>
           </div>
-        </div>
-
-        <button class="submit-btn" onclick="editProfile()">Edit Profile</button>
-        <button onclick="logout()" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #ff6b6b, #ff5252); border: none; border-radius: 10px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">Logout</button>
+        </div>        <button class="submit-btn" onclick="editProfile()">Edit Profile</button>
+        <button onclick="logout()" style="width: 100%; padding: 15px; background: black; border: 2px solid white; border-radius: 10px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">Logout</button>
       </div>
     </div>
 
